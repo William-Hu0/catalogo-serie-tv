@@ -1,0 +1,32 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-4">
+
+  <h2 class="mb-3">📺 Lista Media</h2>
+
+  <div class="row">
+
+    <div class="col-md-4 mb-3" *ngFor="let m of media">
+
+      <div class="card shadow-sm h-100">
+
+        <div class="card-body">
+          <h5 class="card-title">{{ m.nome || m.titolo }}</h5>
+
+          <p class="card-text">
+            ID: {{ m.id_media }}
+          </p>
+
+          <a class="btn btn-primary btn-sm"
+             [routerLink]="['/media', m.id_media]">
+            Dettagli
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
