@@ -1,32 +1,79 @@
-<app-navbar></app-navbar>
-
-<div class="container mt-4">
-
-  <h2 class="mb-3">📺 Lista Media</h2>
-
-  <div class="row">
-
-    <div class="col-md-4 mb-3" *ngFor="let m of media">
-
-      <div class="card shadow-sm h-100">
-
-        <div class="card-body">
-          <h5 class="card-title">{{ m.nome || m.titolo }}</h5>
-
-          <p class="card-text">
-            ID: {{ m.id_media }}
-          </p>
-
-          <a class="btn btn-primary btn-sm"
-             [routerLink]="['/media', m.id_media]">
-            Dettagli
-          </a>
-
-        </div>
-
-      </div>
-
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <div>
+      <h2 class="fw-bold m-0 text-gradient">🎬 Catalogo Film & Serie TV</h2>
+      <p class="text-muted small m-0">Gestisci i film e le serie TV presenti nel database cloud</p>
     </div>
+    <span class="badge bg-danger px-3 py-2 rounded-pill fs-6">Live Data</span>
+  </div>
 
+  <div class="card bg-dark border-secondary mb-4 shadow">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label text-light small fw-bold">Cerca per Titolo</label>
+          <input type="text" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroTitolo" (input)="caricaCatalogo()" 
+                 placeholder="Cerca per titolo...">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label text-light small fw-bold">Genere</label>
+          <select class="form-select bg-secondary text-white border-0" 
+                  [(ngModel)]="filtroGenere" (change)="caricaCatalogo()">
+            <option value="">Tutti i generi</option>
+            <option value="1">Azione</option>
+            <option value="2">Drammatico</option>
+            <option value="3">Fantascienza</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label text-light small fw-bold">Anno di Uscita</label>
+          <input type="number" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroAnno" (input)="caricaCatalogo()" 
+                 placeholder="Anno di uscita">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary shadow overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle m-0 text-center">
+        <thead class="table-secondary text-uppercase fs-7 tracking-wider">
+          <tr>
+            <th scope="col" class="py-3 text-start ps-4">Titolo</th>
+            <th scope="col" class="py-3">Anno</th>
+            <th scope="col" class="py-3">Voto</th>
+            <th scope="col" class="py-3">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of elencoMedia; track item.id_media) {
+            <tr>
+              <td class="text-start fw-semibold ps-4">
+                <a [routerLink]="['/media', item.id_media]" class="text-info text-decoration-none href-link">
+                  {{ item.titolo }}
+                </a>
+              </td>
+              <td><span class="badge bg-secondary">{{ item.anno_uscita }}</span></td>
+              <td>
+                <span class="text-warning fw-bold">⭐ {{ item.voto_medio }}</span><span class="small text-muted">/10</span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaFilm(item.id_media)">
+                  ❌ Elimina
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="py-5 text-muted">
+                Nessun contenuto trovato nel catalogo.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

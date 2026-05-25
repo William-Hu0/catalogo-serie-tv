@@ -1,0 +1,44 @@
+/* Stile personalizzato integrato con Bootstrap per Dark Mode */
+
+body {
+  background-color: #121212 !important; /* Forza lo sfondo scuro se non impostato globalmente */
+}
+
+/* Effetto sfumato sul titolo */
+.text-gradient {
+  background: linear-gradient(45deg, #ff416c, #ff4b2b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ottimizzazione degli input scuri per i filtri */
+.form-control::placeholder {
+  color: #b3b3b3 !important;
+  opacity: 0.7;
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: #495057 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important; /* Glow rosso coordinato */
+  border-color: #dc3545 !important;
+}
+
+/* Stile intestazione tabella */
+.fs-7 {
+  font-size: 0.8rem;
+}
+.tracking-wider {
+  letter-spacing: 0.08em;
+}
+
+/* Animazione Hover sulle righe della tabella */
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Arrotondamento delle Card */
+.card {
+  border-radius: 12px;
+}

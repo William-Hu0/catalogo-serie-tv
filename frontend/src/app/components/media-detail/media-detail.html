@@ -1,0 +1,78 @@
+@if (film) {
+  <div class="detail-card">
+    <div class="header-inline">
+      <h2>{{ film.titolo }}</h2>
+      <span class="badge-tipo" [ngClass]="film.tipo === 'Film' ? 'bg-film' : 'bg-serie'">
+        {{ film.tipo === 'Film' ? '🎬 Film' : '📺 Serie TV' }}
+      </span>
+    </div>
+    
+    <p class="info-row">Anno: {{ film.anno_uscita }} | Valutazione: ⭐ {{ film.voto_medio || 'N/D' }}</p>
+
+    <div class="sezione-box">
+      <strong>Disponibile su:</strong>
+      <div class="tag-list">
+        @for (p of film.piattaforme; track p.id_piattaforma) {
+          <span class="badge-tag blue">{{ p.nome_piattaforma }}</span>
+        } @empty { <span>Nessuna piattaforma associata.</span> }
+      </div>
+    </div>
+
+    <p class="trama"><strong>Trama:</strong> {{ film.trama || 'Trama non disponibile.' }}</p>
+    
+    <div class="sezione-box">
+      <strong>Regia di:</strong> 
+      @if (film.id_regista) {
+        <a [routerLink]="['/registi', film.id_regista]" class="link-cliccabile">👤 {{ film.nome_regista }}</a>
+      } @else { <span>Regista non specificato</span> }
+    </div>
+
+    <div class="sezione-box">
+      <strong>Cast attori:</strong>
+      <div class="tag-list">
+        @for (attore of film.cast; track attore.id_attore) {
+          <a [routerLink]="['/attori', attore.id_attore]" class="badge-tag grey">👤 {{ attore.nome }}</a>
+        } @empty { <span>Nessun attore registrato.</span> }
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+
+    @if (film.tipo === 'Film') {
+      <div class="info-specifica">
+        <h3>🎬 Informazioni Film</h3>
+        <p><strong>Durata:</strong> {{ film.durata_minuti || 'N/D' }} minuti</p>
+      </div>
+    } @else {
+      <div class="stagioni-sezione">
+        <h3>📅 Elenco Stagioni ed Episodi</h3>
+        @for (stg of film.stagioni; track stg.id_stagione) {
+          <details class="stagione-accordion">
+            <summary>
+              Stagione {{ stg.numero_stagione }} 
+              @if (stg.titolo_stagione) { • {{ stg.titolo_stagione }} }
+            </summary>
+            <ul class="episodi-list">
+              @for (ep of stg.episodi; track ep.numero_episodio) {
+                <li>
+                  <span class="ep-num">Episodio {{ ep.numero_episodio }}</span> 
+                  <span class="ep-name">{{ ep.titolo_episodio }}</span>
+                  @if (ep.duration || ep.durata) { 
+                    <span class="ep-duration">⏱️ {{ ep.duration || ep.durata }} min</span> 
+                  }
+                </li>
+              } @empty { <li>Nessun episodio presente per questa stagione.</li> }
+            </ul>
+          </details>
+        } @empty { <p>Nessuna stagione registrata.</p> }
+      </div>
+    }
+
+    <hr class="my-4 border-secondary">
+    <button routerLink="/" class="btn-back">⬅️ Torna al Catalogo</button>
+  </div>
+} @else {
+  <div class="loading-box text-center py-5">
+    <p class="text-muted">Caricamento dati in corso...</p>
+  </div>
+}

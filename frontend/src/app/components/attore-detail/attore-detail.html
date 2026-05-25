@@ -1,0 +1,16 @@
+@if (attore) {
+  <div class="detail-card">
+    <span class="badge-tipo bg-film">Scheda Anagrafica</span>
+    <h2>{{ attore.nome }}</h2>
+    <hr>
+    <p><strong>Nazionalità:</strong> {{ attore.nazionalita || 'Non specificata' }}</p>
+    <p><strong>Data di Nascita:</strong> {{ attore.data_nascita | date:'dd/MM/yyyy' }}</p>
+    <div class="bio-box">
+      <p><strong>Note Biografiche / Profilo:</strong></p>
+      <p>{{ attore.biografia || 'Nessuna nota biografica presente.' }}</p>
+    </div>
+    <button routerLink="/attori" class="btn-back">⬅️ Torna Indietro</button>
+  </div>
+} @else {
+  <p>Caricamento dettagli attore...</p>
+}

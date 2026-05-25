@@ -1,0 +1,63 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <div>
+      <h2 class="fw-bold m-0 text-gradient">🎭 Elenco Attori & Cast</h2>
+      <p class="text-muted small m-0">Gestisci le celebrità e le star presenti nel database cloud</p>
+    </div>
+    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6">Hollywood DB</span>
+  </div>
+
+  <div class="card bg-dark border-secondary mb-4 shadow">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label text-light small fw-bold">Cerca Attore per Nome</label>
+          <input type="text" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroNome" (input)="caricaAttori()" 
+                 placeholder="Es. Pedro Pascal, Millie Bobby Brown...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary shadow overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle m-0 text-center">
+        <thead class="table-secondary text-uppercase fs-7 tracking-wider">
+          <tr>
+            <th scope="col" class="py-3">ID</th>
+            <th scope="col" class="py-3 text-start ps-4">Nome Attore</th>
+            <th scope="col" class="py-3">Nazionalità</th>
+            <th scope="col" class="py-3">Data di Nascita</th>
+            <th scope="col" class="py-3">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (attore of elencoAttori; track attore.id_attore) {
+            <tr>
+              <td class="text-muted fw-bold">#{{ attore.id_attore }}</td>
+              <td class="text-start fw-semibold ps-4">
+                <a [routerLink]="['/attori', attore.id_attore]" class="text-info text-decoration-none href-link">
+                  {{ attore.nome }}
+                </a>
+              </td>
+              <td><span class="badge bg-secondary">{{ attore.nazionalita || 'N/D' }}</span></td>
+              <td class="text-muted">{{ (attore.data_nascita | date:'dd/MM/yyyy') || 'N/D' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaAttore(attore.id_attore)">
+                  ❌ Elimina
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="py-5 text-muted">
+                Nessun attore trovato nel database.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

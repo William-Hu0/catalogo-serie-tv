@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MediaDetai } from './media-detai';
+import { RegistaList } from './regista-list';
 
-describe('MediaDetai', () => {
-  let component: MediaDetai;
-  let fixture: ComponentFixture<MediaDetai>;
+describe('RegistaList', () => {
+  let component: RegistaList;
+  let fixture: ComponentFixture<RegistaList>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MediaDetai],
+      imports: [RegistaList],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MediaDetai);
+    fixture = TestBed.createComponent(RegistaList);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

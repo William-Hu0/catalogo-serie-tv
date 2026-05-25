@@ -1,0 +1,61 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <div>
+      <h2 class="fw-bold m-0 text-gradient">🎥 Registi & Creator</h2>
+      <p class="text-muted small m-0">Gestisci i registi delle opere presenti nel database cloud</p>
+    </div>
+    <span class="badge bg-info text-dark px-3 py-2 rounded-pill fs-6">Behind the Camera</span>
+  </div>
+
+  <div class="card bg-dark border-secondary mb-4 shadow">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label text-light small fw-bold">Cerca Regista per Nome</label>
+          <input type="text" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroNomeRegista" (input)="caricaRegisti()" 
+                 placeholder="Es. Christopher Nolan, Quentin Tarantino...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary shadow overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle m-0 text-center">
+        <thead class="table-secondary text-uppercase fs-7 tracking-wider">
+          <tr>
+            <th scope="col" class="py-3">ID</th>
+            <th scope="col" class="py-3 text-start ps-4">Nome Regista</th>
+            <th scope="col" class="py-3">Nazionalità</th>
+            <th scope="col" class="py-3">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (regista of elencoRegisti; track regista.id_regista) {
+            <tr>
+              <td class="text-muted fw-bold">#{{ regista.id_regista }}</td>
+              <td class="text-start fw-semibold ps-4">
+                <a [routerLink]="['/registi', regista.id_regista]" class="text-info text-decoration-none href-link">
+                  {{ regista.nome }}
+                </a>
+              </td>
+              <td><span class="badge bg-secondary">{{ regista.nazionalita || 'N/D' }}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaRegista(regista.id_regista)">
+                  ❌ Elimina
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="py-5 text-muted">
+                Nessun regista trovato nel database.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
