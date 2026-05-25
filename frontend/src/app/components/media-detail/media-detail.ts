@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api'; // Verifica che il percorso del file api.ts sia esatto
@@ -16,7 +16,8 @@ export class MediaDetail implements OnInit {
 
   constructor(
     private route: ActivatedRoute, 
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -30,6 +31,7 @@ export class MediaDetail implements OnInit {
         next: (dati) => {
           console.log('Dati dettaglio ricevuti con successo dal database:', dati);
           this.film = dati;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Errore durante il caricamento del dettaglio media:', err);

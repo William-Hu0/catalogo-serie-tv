@@ -21,9 +21,11 @@ export class AttoreList implements OnInit {
     this.caricaAttori();
   }
 
-  caricaAttori(): void {
-    const params = this.filtroNome ? { nome: this.filtroNome } : {};
-    this.apiService.getAttori(params).subscribe({
+caricaAttori(): void {
+    // Se filtroNome è vuoto, passiamo undefined, altrimenti passiamo la stringa pulita
+    const termineRicerca = this.filtroNome.trim() ? this.filtroNome.trim() : undefined;
+    
+    this.apiService.getAttori(termineRicerca).subscribe({
       next: (data) => {
         this.elencoAttori = data;
       },

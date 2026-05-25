@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api';
@@ -13,13 +13,25 @@ import { ApiService } from '../../services/api';
 export class AttoreDetail implements OnInit {
   attore: any = null;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef // <-- Forza l'aggiornamento grafico
+  ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.apiService.getAttoreDettaglio(id).subscribe({
-      next: (dati) => this.attore = dati,
-      error: (errore) => console.error(errore)
-    });
+    console.log('ID Attore estratto:', id);
+
+    if (id) {
+      this.apiService.getAttoreDettaglio(id).subscribe({
+        next: (dati) => {
+          console.log('Dati attore ricevuti con successo:', dati);
+          this.attore = dati;
+          this.cdr.detectChanges(); // <-- Sveglia Angular all'arrivo dei dati
+        },
+        error: (err) => console.error('Errore caricamento dettaglio attore:', err)
+      });
+    }
   }
 }

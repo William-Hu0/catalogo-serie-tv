@@ -21,10 +21,11 @@ export class RegistaList implements OnInit {
   ngOnInit(): void {
     this.caricaRegisti();
   }
-
-  caricaRegisti(): void {
-    const params = this.filtroNomeRegista ? { nome: this.filtroNomeRegista } : {};
-    this.apiService.getRegisti(params).subscribe({
+caricaRegisti(): void {
+    // Se filtroNomeRegista è vuoto, passiamo undefined, altrimenti passiamo la stringa pulita
+    const termineRicerca = this.filtroNomeRegista.trim() ? this.filtroNomeRegista.trim() : undefined;
+    
+    this.apiService.getRegisti(termineRicerca).subscribe({
       next: (data) => {
         this.elencoRegisti = data;
       },

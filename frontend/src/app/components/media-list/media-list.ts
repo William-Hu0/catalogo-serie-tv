@@ -12,10 +12,12 @@ import { ApiService } from '../../services/api';
   styleUrls: ['./media-list.css']
 })
 export class MediaListComponent implements OnInit {
-  elencoMedia: any[] = [];
+  // Variabili collegate tramite [(ngModel)] al tuo HTML
   filtroTitolo: string = '';
   filtroGenere: string = '';
   filtroAnno: string = '';
+  
+  elencoMedia: any[] = [];
 
   constructor(private apiService: ApiService) {}
 
@@ -23,18 +25,40 @@ export class MediaListComponent implements OnInit {
     this.caricaCatalogo();
   }
 
-  caricaCatalogo(): void {
-    this.apiService.getMedia(this.filtroTitolo, this.filtroGenere, this.filtroAnno).subscribe({
-      next: (dati) => this.elencoMedia = dati,
-      error: (err) => console.error(err)
+caricaCatalogo(): void {
+    // Creiamo un unico oggetto (1 solo argomento) con dentro le proprietà dei filtri
+    const filtri: any = {};
+
+    if (this.filtroTitolo && this.filtroTitolo.trim()) {
+      filtri.titolo = this.filtroTitolo.trim();
+    }
+    if (this.filtroGenere) {
+      filtri.id_genere = this.filtroGenere;
+    }
+    if (this.filtroAnno) {
+      filtri.anno = String(this.filtroAnno);
+    }
+
+    // Passiamo solo l'oggetto 'filtri' (0-1 argomenti rispettato!)
+    this.apiService.getMedia(filtri).subscribe({
+      next: (data) => {
+        console.log('Catalogo caricato con successo:', data);
+        this.elencoMedia = data;
+      },
+      error: (err) => {
+        console.error('Errore durante il caricamento del catalogo:', err);
+      }
     });
   }
 
   eliminaFilm(id: number): void {
-    if (confirm('Vuoi davvero eliminare questo contenuto?')) {
-      this.apiService.deleteMedia(id).subscribe(() => {
-        alert('Eliminato con successo!');
-        this.caricaCatalogo();
+    if (confirm('Sei sicuro di voler eliminare permanentemente questo contenuto?')) {
+      this.apiService.deleteMedia(id).subscribe({
+        next: () => {
+          console.log('Media eliminato:', id);
+          this.caricaCatalogo(); // Rinfresca la tabella
+        },
+        error: (err) => console.error('Errore eliminazione:', err)
       });
     }
   }

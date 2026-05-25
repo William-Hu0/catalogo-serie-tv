@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api';
@@ -13,13 +13,25 @@ import { ApiService } from '../../services/api';
 export class RegistaDetail implements OnInit {
   regista: any = null;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef // <-- Forza l'aggiornamento grafico
+  ) {}
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.apiService.getRegistaDettaglio(id).subscribe({
-      next: (dati) => this.regista = dati,
-      error: (errore) => console.error(errore)
-    });
+    console.log('ID Regista estratto:', id);
+
+    if (id) {
+      this.apiService.getRegistaDettaglio(id).subscribe({
+        next: (dati) => {
+          console.log('Dati regista ricevuti con successo:', dati);
+          this.regista = dati;
+          this.cdr.detectChanges(); // <-- Sveglia Angular all'arrivo dei dati
+        },
+        error: (err) => console.error('Errore caricamento dettaglio regista:', err)
+      });
+    }
   }
 }

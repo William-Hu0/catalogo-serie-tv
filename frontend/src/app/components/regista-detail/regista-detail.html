@@ -1,16 +1,38 @@
 @if (regista) {
   <div class="detail-card">
-    <span class="badge-tipo bg-serie">Dettagli Regia</span>
-    <h2>{{ regista.nome }}</h2>
-    <hr>
-    <p><strong>Nazionalità:</strong> {{ regista.nazionalita || 'N/D' }}</p>
-    <p><strong>Data di Nascita:</strong> {{ regista.data_nascita | date:'dd/MM/yyyy' }}</p>
-    <div class="bio-box">
-      <p><strong>Note / Biografia:</strong></p>
-      <p>{{ regista.biografia || 'Nessun dettaglio inserito.' }}</p>
+    <div class="header-inline">
+      <h2>🎥 Regista: {{ regista.nome }}</h2>
     </div>
-    <button routerLink="/registi" class="btn-back">⬅️ Torna Indietro</button>
+
+    <p class="info-row">
+      Nazionalità: {{ regista.nazionalita || 'N/D' }}
+    </p>
+
+    <hr class="my-4 border-secondary">
+
+    <div class="media-correlati">
+      <h3>🎬 Opere dirette:</h3>
+      <div class="tag-list-vertical">
+        @for (item of regista.produzioni; track item.id_media || $index) {
+          <div class="media-item-link">
+            <a [routerLink]="['/media', item.id_media]" class="link-cliccabile fw-bold">
+              📣 {{ item.titolo }}
+            </a>
+            <span class="text-muted small"> ({{ item.anno_uscita }} - {{ item.tipo === 'SerieTV' ? 'Serie TV' : 'Film' }})</span>
+          </div>
+        } @empty {
+          <p class="text-muted small">Nessun contenuto diretto da questo regista nel database.</p>
+        }
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+    
+    <button routerLink="/registi" class="btn-back">⬅️ Torna alla lista registi</button>
   </div>
 } @else {
-  <p>Caricamento dettagli regista...</p>
+  <div class="loading-box text-center py-5">
+    <div class="spinner-border text-danger mb-2" role="status"></div>
+    <p class="text-muted">Caricamento dati regista in corso...</p>
+  </div>
 }

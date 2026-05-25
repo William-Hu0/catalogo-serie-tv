@@ -1,16 +1,39 @@
 @if (attore) {
   <div class="detail-card">
-    <span class="badge-tipo bg-film">Scheda Anagrafica</span>
-    <h2>{{ attore.nome }}</h2>
-    <hr>
-    <p><strong>Nazionalità:</strong> {{ attore.nazionalita || 'Non specificata' }}</p>
-    <p><strong>Data di Nascita:</strong> {{ attore.data_nascita | date:'dd/MM/yyyy' }}</p>
-    <div class="bio-box">
-      <p><strong>Note Biografiche / Profilo:</strong></p>
-      <p>{{ attore.biografia || 'Nessuna nota biografica presente.' }}</p>
+    <div class="header-inline">
+      <h2>👤 {{ attore.nome }}</h2>
     </div>
-    <button routerLink="/attori" class="btn-back">⬅️ Torna Indietro</button>
+
+    <p class="info-row">
+      Nazionalità: {{ attore.nazionalita || 'N/D' }} | 
+      Anno di Nascita: {{ attore.anno_nascita || 'N/D' }}
+    </p>
+
+    <hr class="my-4 border-secondary">
+
+    <div class="media-correlati">
+      <h3>🎬 Ha recitato in:</h3>
+      <div class="tag-list-vertical">
+        @for (item of attore.filmografia; track item.id_media || $index) {
+          <div class="media-item-link">
+            <a [routerLink]="['/media', item.id_media]" class="link-cliccabile fw-bold">
+              🍿 {{ item.titolo }}
+            </a>
+            <span class="text-muted small"> ({{ item.anno_uscita }} - {{ item.tipo === 'SerieTV' ? 'Serie TV' : 'Film' }})</span>
+          </div>
+        } @empty {
+          <p class="text-muted small">Nessun film o serie TV associata a questo attore nel database.</p>
+        }
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+    
+    <button routerLink="/attori" class="btn-back">⬅️ Torna alla lista attori</button>
   </div>
 } @else {
-  <p>Caricamento dettagli attore...</p>
+  <div class="loading-box text-center py-5">
+    <div class="spinner-border text-danger mb-2" role="status"></div>
+    <p class="text-muted">Caricamento dati attore in corso...</p>
+  </div>
 }
