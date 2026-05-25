@@ -36,12 +36,15 @@
             <tr>
               <td class="text-muted fw-bold">#{{ regista.id_regista }}</td>
               <td class="text-start fw-semibold ps-4">
-                <a [routerLink]="['/registi', regista.id_regista]" class="text-info text-decoration-none href-link">
-                  {{ regista.nome }}
+                <a [routerLink]="['/registi', regista.id_regista]" class="text-info text-decoration-none href-link testo-esteso fw-bold">
+                  🎥 {{ regista.nome }} <h2></h2> {{ regista.cognome }}
                 </a>
               </td>
               <td><span class="badge bg-secondary">{{ regista.nazionalita || 'N/D' }}</span></td>
               <td>
+                <button class="btn btn-sm btn-outline-warning px-3 rounded-pill me-2" [routerLink]="['/registi', regista.id_regista]">
+                  ✏️ Modifica
+                </button>
                 <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaRegista(regista.id_regista)">
                   ❌ Elimina
                 </button>

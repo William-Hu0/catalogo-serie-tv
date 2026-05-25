@@ -40,42 +40,54 @@ def home():
 # 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
 # =========================================================================
 
-# L1 & L2: LISTA MEDIA + FILTRI AVANZATI (TITOLO, GENERE E ANNO DI USCITA)
+# L1 & L2: LISTA MEDIA + FILTRI AVANZATI (TITOLO, GENERE, ANNO E TIPO)
 @app.route('/api/v1/media', methods=['GET'])
 def get_all_media():
     try:
         titolo_cercato = request.args.get('titolo')
         id_genere_filtrato = request.args.get('id_genere')
         anno_cercato = request.args.get('anno')
+        tipo_cercato = request.args.get('tipo') 
         
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # Costruiamo la query base per Media
             sql = "SELECT * FROM Media WHERE 1=1"
             params = []
             
-            # Filtro per Titolo (ricerca parziale con LIKE)
+            # Filtro per Titolo
             if titolo_cercato:
                 sql += " AND titolo LIKE %s"
                 params.append(f"%{titolo_cercato}%")
                 
-            # Filtro per Genere (tramite ID esatto)
+            # Filtro per Genere
             if id_genere_filtrato:
                 sql += " AND id_genere = %s"
                 params.append(int(id_genere_filtrato))
                 
-            # Filtro per Anno di Uscita (esatto)
+            # Filtro per Anno di Uscita
             if anno_cercato:
                 sql += " AND anno_uscita = %s"
                 params.append(int(anno_cercato))
             
+            # Filtro per Tipo (Film o SerieTV) controllando le tabelle gemelle
+            if tipo_cercato:
+                if tipo_cercato == 'Film':
+                    sql += " AND id_media IN (SELECT id_media FROM Film)"
+                elif tipo_cercato == 'SerieTV':
+                    sql += """ AND (
+                        id_media IN (SELECT id_media FROM SerieTV) 
+                        OR id_media IN (SELECT id_media FROM Stagione)
+                    )"""
             cursor.execute(sql, params)
             result = cursor.fetchall()
+            
         connection.close()
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# L2: DETTAGLIO MEDIA STRUTTURATO (Riconosce Film/Serie, estrae Regista, Cast, Piattaforme, Stagioni ed Episodi)
+    
+# L2: DETTAGLIO MEDIA STRUTTURATO (Riconosce Film/Serie, estrae Regista, Cast, Piattaforme ed eventuali Stagioni)
 @app.route('/api/v1/media/<int:id_media>', methods=['GET'])
 def get_media_dettaglio(id_media):
     try:
@@ -104,25 +116,19 @@ def get_media_dettaglio(id_media):
             
             if film_data:
                 media['tipo'] = 'Film'
-                media['durata_minuti'] = film_data.get('durata_minuti')
+                media['durata_minuti'] = film_data.get('durata_min')
                 media['stagioni'] = [] # I film non possiedono stagioni
             else:
                 media['tipo'] = 'SerieTV'
                 
-                # 3. Se è una Serie TV, recupera le sue Stagioni nidificate
-                sql_stagioni = """
-                    SELECT * FROM Stagione 
-                    WHERE id_media = %s
-                """
+                # 3. Se non è un film, cerca le stagioni collegate alla Serie TV
+                sql_stagioni = "SELECT * FROM Stagione WHERE id_media = %s"
                 cursor.execute(sql_stagioni, (id_media,))
                 stagioni = cursor.fetchall()
 
                 # Per ogni singola stagione, recupera i relativi Episodi
                 for stagione in stagioni:
-                    sql_episodi = """
-                        SELECT * FROM Episodio 
-                        WHERE id_stagione = %s
-                    """
+                    sql_episodi = "SELECT * FROM Episodio WHERE id_stagione = %s"
                     cursor.execute(sql_episodi, (stagione.get('id_stagione'),))
                     stagione['episodi'] = cursor.fetchall()
 
@@ -145,7 +151,17 @@ def get_media_dettaglio(id_media):
             """
             cursor.execute(sql_cast, (id_media,))
             media['cast'] = cursor.fetchall()
-
+            
+            # 6. Recupera le Recensioni degli utenti (Corretto il campo r.testo in base al CSV)
+            sql_recensioni = """
+                SELECT u.username AS utente, r.voto AS stelle, r.testo AS commento 
+                FROM Recensione r
+                JOIN Utente u ON r.id_utente = u.id_utente
+                WHERE r.id_media = %s
+            """
+            cursor.execute(sql_recensioni, (id_media,))
+            media['recensioni'] = cursor.fetchall()
+            
         connection.close()
         return jsonify(media), 200
     except Exception as e:
@@ -228,10 +244,36 @@ def get_attore_dettaglio(id_attore):
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM Attore WHERE id_attore = %s"
-            cursor.execute(sql, (id_attore,))
+            # 1. Recupera i dati anagrafici e la BIO dell'attore
+            sql_attore = "SELECT id_attore, nome, cognome, nazionalita, bio FROM Attore WHERE id_attore = %s"
+            cursor.execute(sql_attore, (id_attore,))
             attore = cursor.fetchone()
+            
+            if attore:
+                # 2. Recupera la filmografia unendo Media e la tabella pivot Media_Attore
+                sql_filmografia = """
+                    SELECT m.id_media, m.titolo, m.anno_uscita
+                    FROM Media m
+                    JOIN Media_Attore ma ON m.id_media = ma.id_media
+                    WHERE ma.id_attore = %s
+                """
+                cursor.execute(sql_filmografia, (id_attore,))
+                filmografia = cursor.fetchall()
+                
+                # Mappatura del tipo per Angular controllando la tabella Film o SerieTV
+                for item in filmografia:
+                    sql_check_film = "SELECT 1 FROM Film WHERE id_media = %s"
+                    cursor.execute(sql_check_film, (item.get('id_media'),))
+                    if cursor.fetchone():
+                        item['tipo'] = 'Film'
+                    else:
+                        item['tipo'] = 'SerieTV'
+                
+                # Alleghiamo l'array mappato all'oggetto attore
+                attore['filmografia'] = filmografia
+                
         connection.close()
+        
         if attore:
             return jsonify(attore), 200
         return jsonify({"message": "Attore non trovato"}), 404
@@ -310,6 +352,35 @@ def add_utente():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# ⏬ NUOVA ROTTA: MODIFICA UTENTE (PUT) ⏬
+@app.route('/api/v3/utenti/<int:id_utente>', methods=['PUT'])
+def update_utente(id_utente):
+    try:
+        data = request.json
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "UPDATE Utente SET username=%s, email=%s WHERE id_utente=%s"
+            cursor.execute(sql, (data['username'], data['email'], id_utente))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Dati utente aggiornati con successo!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ⏬ NUOVA ROTTA: ELIMINAZIONE UTENTE (DELETE) ⏬
+@app.route('/api/v3/utenti/<int:id_utente>', methods=['DELETE'])
+def delete_utente(id_utente):
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "DELETE FROM Utente WHERE id_utente = %s"
+            cursor.execute(sql, (id_utente,))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Utente eliminato permanentemente!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 # =========================================================================
 # ⭐ SEZIONE 5: RECENSIONI (Feed & Critiche)
@@ -340,15 +411,46 @@ def add_recensione():
         data = request.json
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # Corretto l'inserimento usando la colonna 'testo' al posto di 'commento'
             sql = """
-                INSERT INTO Recensione (voto, commento, id_utente, id_media) 
+                INSERT INTO Recensione (voto, testo, id_utente, id_media) 
                 VALUES (%s, %s, %s, %s)
             """
-            cursor.execute(sql, (int(data['voto']), data.get('commento', ''), 
+            cursor.execute(sql, (int(data['voto']), data.get('testo', ''), 
                                  int(data['id_utente']), int(data['id_media'])))
             connection.commit()
         connection.close()
         return jsonify({"message": "Recensione inserita con successo!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ⏬ NUOVA ROTTA: MODIFICA RECENSIONE (PUT) ⏬
+@app.route('/api/v3/recensioni/<int:id_recensione>', methods=['PUT'])
+def update_recensione(id_recensione):
+    try:
+        data = request.json
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Sincronizzato con l'uso della colonna 'testo' del database
+            sql = "UPDATE Recensione SET voto=%s, testo=%s WHERE id_recensione=%s"
+            cursor.execute(sql, (int(data['voto']), data.get('testo', ''), id_recensione))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Recensione modificata con successo!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ⏬ NUOVA ROTTA: ELIMINAZIONE RECENSIONE (DELETE) ⏬
+@app.route('/api/v3/recensioni/<int:id_recensione>', methods=['DELETE'])
+def delete_recensione(id_recensione):
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "DELETE FROM Recensione WHERE id_recensione = %s"
+            cursor.execute(sql, (id_recensione,))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Recensione rimossa con successo!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -26,7 +26,7 @@
         <thead class="table-secondary text-uppercase fs-7 tracking-wider">
           <tr>
             <th scope="col" class="py-3">ID</th>
-            <th scope="col" class="py-3 text-start ps-4">Nome Attore</th>
+            <th scope="col" class="py-3 text-start ps-4">Nome e Cognome</th>
             <th scope="col" class="py-3">Nazionalità</th>
             <th scope="col" class="py-3">Data di Nascita</th>
             <th scope="col" class="py-3">Azioni</th>
@@ -37,13 +37,16 @@
             <tr>
               <td class="text-muted fw-bold">#{{ attore.id_attore }}</td>
               <td class="text-start fw-semibold ps-4">
-                <a [routerLink]="['/attori', attore.id_attore]" class="text-info text-decoration-none href-link">
-                  {{ attore.nome }}
+                <a [routerLink]="['/attori', attore.id_attore]" class="text-info text-decoration-none href-link testo-esteso fw-bold">
+                  👤 {{ attore.nome }} {{ attore.cognome }}
                 </a>
               </td>
               <td><span class="badge bg-secondary">{{ attore.nazionalita || 'N/D' }}</span></td>
               <td class="text-muted">{{ (attore.data_nascita | date:'dd/MM/yyyy') || 'N/D' }}</td>
               <td>
+                <button class="btn btn-sm btn-outline-warning px-3 rounded-pill me-2" [routerLink]="['/attori', attore.id_attore]">
+                  ✏️ Modifica
+                </button>
                 <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaAttore(attore.id_attore)">
                   ❌ Elimina
                 </button>

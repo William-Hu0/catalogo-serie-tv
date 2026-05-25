@@ -1,46 +1,135 @@
 @if (film) {
   <div class="detail-card">
-    <div class="header-inline">
+    <div class="header-inline mb-4">
       <h2>{{ film.titolo }}</h2>
       <span class="badge-tipo" [ngClass]="film.tipo === 'Film' ? 'bg-film' : 'bg-serie'">
         {{ film.tipo === 'Film' ? '🎬 Film' : '📺 Serie TV' }}
       </span>
     </div>
-    
-    <p class="info-row">
-      Anno: {{ film.anno_uscita }} | 
-      Valutazione: <span class="text-warning">⭐ {{ film.voto_medio || 'N/D' }}</span>/10
-    </p>
 
-    <div class="sezione-box">
-      <strong>Disponibile su:</strong>
-      <div class="tag-list">
-        @for (p of film.piattaforme; track $index) {
-          <span class="badge-tag blue">{{ p.nome_piattaforma || 'Streaming' }}</span>
-        } @empty { 
-          <span class="text-muted small">Nessuna piattaforma associata.</span> 
-        }
+    @if (messaggioSuccess) {
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ messaggioSuccess }}
+      </div>
+    }
+    @if (messaggioError) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ messaggioError }}
+      </div>
+    }
+
+    @if (!modifficaAttiva) {
+      <div class="mb-4">
+        <button class="btn btn-outline-warning me-2" (click)="attivaModifica()">
+          ✏️ Modifica
+        </button>
+      </div>
+    } @else {
+      <div class="card bg-dark border-warning mb-4 shadow">
+        <div class="card-header bg-warning text-dark fw-bold">Modifica Media</div>
+        <div class="card-body">
+          <form (ngSubmit)="salvaModifica()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-light small fw-bold">Titolo</label>
+                <input type="text" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.titolo" name="titolo" required>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-light small fw-bold">Anno Uscita</label>
+                <input type="number" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.anno_uscita" name="anno_uscita">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-light small fw-bold">Voto Medio</label>
+                <input type="number" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.voto_medio" name="voto_medio" min="0" max="10" step="0.1">
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-6">
+                <label class="form-label text-light small fw-bold">Lingua Originale</label>
+                <input type="text" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.lingua_orig" name="lingua_orig">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light small fw-bold">ID Genere</label>
+                <input type="number" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.id_genere" name="id_genere">
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <label class="form-label text-light small fw-bold">Trama</label>
+              <textarea class="form-control bg-secondary text-white border-0" 
+                        [(ngModel)]="formModifica.trama" name="trama" rows="4"></textarea>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button type="submit" class="btn btn-outline-success" [disabled]="staCaricando">
+                {{ staCaricando ? '⏳ Salvataggio...' : '💾 Salva Modifiche' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="annullaModifica()" [disabled]="staCaricando">
+                ❌ Annulla
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+    
+    <div class="d-flex flex-column flex-md-row gap-4 mb-4">
+      
+      <div class="locandina-wrapper text-center">
+        <img [src]="film.locandina_url || 'assets/placeholder.png'" 
+             alt="Locandina di {{ film.titolo }}" 
+             class="img-fluid rounded shadow locandina-img">
+      </div>
+
+      <div class="flex-grow-1">
+        <p class="info-row">
+          <strong>Anno:</strong> {{ film.anno_uscita }} | 
+          <strong>Valutazione:</strong> <span class="text-warning">⭐ {{ film.voto_medio || 'N/D' }}</span>/10
+        </p>
+
+        <div class="sezione-box mb-3">
+          <strong>Disponibile su:</strong>
+          <div class="tag-list">
+            @for (p of film.piattaforme; track $index) {
+              <span class="badge-tag blue">{{ p.nome_piattaforma || 'Streaming' }}</span>
+            } @empty { 
+              <span class="text-muted small">Nessuna piattaforma associata.</span> 
+            }
+          </div>
+        </div>
+
+        <p class="trama mb-0">
+          <strong>Trama:</strong> {{ film.trama || 'Trama non disponibile per questo contenuto.' }}
+        </p>
       </div>
     </div>
 
-    <p class="trama">
-      <strong>Trama:</strong> {{ film.trama || 'Trama non disponibile per questo contenuto.' }}
-    </p>
-    
-    <div class="sezione-box">
+    <div class="sezione-box mb-3">
       <strong>Regia di:</strong> 
       @if (film.id_regista) {
-        <a [routerLink]="['/registi', film.id_regista]" class="link-cliccabile">👤 {{ film.nome_regista }}</a>
+        <a [routerLink]="['/registi', film.id_regista]" class="link-cliccabile href-link testo-esteso fw-bold text-info text-decoration-none">
+          👤 {{ film.nome_regista }} {{ film.cognome_regista }}
+        </a>
       } @else { 
         <span class="text-muted small">Regista non specificato</span> 
       }
     </div>
 
-    <div class="sezione-box">
+    <div class="sezione-box mb-4">
       <strong>Cast attori:</strong>
-      <div class="tag-list">
+      <div class="tag-list-vertical mt-1">
         @for (attore of film.cast; track $index) {
-          <a [routerLink]="['/attori', attore.id_attore]" class="badge-tag grey">👤 {{ attore.nome }}</a>
+          <div class="mb-2">
+            <a [routerLink]="['/attori', attore.id_attore]" class="badge-tag grey href-link testo-esteso fw-bold text-decoration-none">
+              👤 {{ attore.nome }} {{ attore.cognome }}
+            </a>
+          </div>
         } @empty { 
           <span class="text-muted small">Nessun attore registrato nel cast.</span> 
         }
@@ -55,7 +144,6 @@
         <p><strong>Durata:</strong> {{ film.durata_minuti || 'N/D' }} minuti</p>
       </div>
     } 
-    
     @else {
       <div class="stagioni-sezione">
         <h3>📅 Elenco Stagioni ed Episodi</h3>
@@ -84,6 +172,29 @@
         }
       </div>
     }
+
+    <hr class="my-5 border-secondary">
+
+    <div class="reviews-section">
+      <h3 class="mb-4 text-warning">⭐ Recensioni della Community</h3>
+      <div class="row g-3">
+        @for (rev of film.recensioni; track $index) {
+          <div class="col-md-6">
+            <div class="card bg-secondary-dark border-secondary shadow-sm h-100">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="fw-bold text-info">@{{ rev.utente }}</span>
+                  <span class="badge bg-warning text-dark">⭐ {{ rev.stelle }}/10</span>
+                </div>
+                <p class="card-text text-light small m-0 italic">"{{ rev.commento }}"</p>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted ps-2 small">Non ci sono ancora recensioni per questo titolo nel cloud database.</p>
+        }
+      </div>
+    </div>
 
     <hr class="my-4 border-secondary">
     

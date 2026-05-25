@@ -54,3 +54,56 @@
 .main-content {
   padding: 20px;
 }
+.testo-esteso, .href-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;   /* IMPEDISCE il ritorno a capo del cognome */
+  flex-wrap: nowrap !important;
+  gap: 5px;                         /* Spazio fisso tra emoji e testo */
+}
+
+/* 2. Forza i titoli H2 delle pagine di dettaglio (es. Tom Hanks) */
+.header-inline h2, .detail-card h2 {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;   /* Blocca il nome e il cognome uniti */
+  flex-wrap: nowrap !important;
+  gap: 10px;
+}
+
+/* 3. Sicurezza per le celle della tabella delle liste */
+table.table td {
+  white-space: nowrap !important;   /* Evita che la cella si stringa forzando il testo in verticale */
+  vertical-align: middle !important;
+}
+
+.tag-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.bg-secondary-dark {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px;
+}
+
+.italic {
+  font-style: italic;
+}
+.bg-dark-soft {
+  background-color: rgba(255, 255, 255, 0.85) !important; /* Sfondo chiaro per far leggere il testo nero */
+}
+.bio-text {
+  color: #000000 !important;          /* FORZA IL COLORE NERO ASSOLUTO */
+  white-space: normal !important;      /* Permette il ritorno a capo */
+  word-break: break-word !important;   /* Evita che le parole escano dal box */
+  line-height: 1.6;                    /* Spaziatura di lettura ideale */
+  font-size: 0.95rem;
+  font-weight: 500;                    /* Un briciolo più spesso per migliorarne la leggibilità */
+  text-align: justify;
+}
+.p{
+  color:#ffffff
+}

@@ -13,14 +13,17 @@ export class ApiService {
   constructor(private http: HttpClient) { }
 
   // =========================================================================
-  // 🎬 SEZIONE 1: MEDIA
+  // 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
   // =========================================================================
+  
+  // Ottiene l'elenco includendo il filtro correttivo sul "tipo" (Film o SerieTV)
   getMedia(filtri?: any): Observable<any[]> {
     let params = new HttpParams();
     if (filtri) {
       if (filtri.titolo) params = params.set('titolo', filtri.titolo);
       if (filtri.id_genere) params = params.set('id_genere', filtri.id_genere);
       if (filtri.anno) params = params.set('anno', filtri.anno);
+      if (filtri.tipo) params = params.set('tipo', filtri.tipo); // AGGIUNTO: Risolve il problema del filtro tipo
     }
     return this.http.get<any[]>(`${this.baseUrl}/v1/media`, { params });
   }
@@ -29,12 +32,20 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}/v1/media/${id}`);
   }
 
+  addMedia(media: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v3/media`, media);
+  }
+
+  updateMedia(id: number, media: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/v3/media/${id}`, media);
+  }
+
   deleteMedia(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/v3/media/${id}`);
   }
 
   // =========================================================================
-  // 🎭 SEZIONE 2: ATTORI
+  // 🎭 SEZIONE 2: ATTORI (CRUD COMPLETO)
   // =========================================================================
   getAttori(nome?: string): Observable<any[]> {
     let params = new HttpParams();
@@ -46,8 +57,23 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}/v1/attori/${id}`);
   }
 
+  // AGGIUNTO: Inserimento Attore (POST)
+  addAttore(attore: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v3/attori`, attore);
+  }
+
+  // AGGIUNTO: Modifica Attore (PUT)
+  updateAttore(id: number, attore: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/v3/attori/${id}`, attore);
+  }
+
+  // AGGIUNTO: Eliminazione Attore (DELETE)
+  deleteAttore(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/v3/attori/${id}`);
+  }
+
   // =========================================================================
-  // 🎥 SEZIONE 3: REGISTI
+  // 🎥 SEZIONE 3: REGISTI (CRUD COMPLETO)
   // =========================================================================
   getRegisti(nome?: string): Observable<any[]> {
     let params = new HttpParams();
@@ -57,5 +83,20 @@ export class ApiService {
 
   getRegistaDettaglio(id: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/v1/registi/${id}`);
+  }
+
+  // AGGIUNTO: Inserimento Regista (POST)
+  addRegista(regista: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v3/registi`, regista);
+  }
+
+  // AGGIUNTO: Modifica Regista (PUT)
+  updateRegista(id: number, regista: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/v3/registi/${id}`, regista);
+  }
+
+  // AGGIUNTO: Eliminazione Regista (DELETE)
+  deleteRegista(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/v3/registi/${id}`);
   }
 }

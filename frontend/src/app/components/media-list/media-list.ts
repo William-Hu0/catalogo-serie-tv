@@ -16,6 +16,7 @@ export class MediaListComponent implements OnInit {
   filtroTitolo: string = '';
   filtroGenere: string = '';
   filtroAnno: string = '';
+  filtroTipo: string = '';
   
   elencoMedia: any[] = [];
 
@@ -26,7 +27,6 @@ export class MediaListComponent implements OnInit {
   }
 
 caricaCatalogo(): void {
-    // Creiamo un unico oggetto (1 solo argomento) con dentro le proprietà dei filtri
     const filtri: any = {};
 
     if (this.filtroTitolo && this.filtroTitolo.trim()) {
@@ -38,8 +38,11 @@ caricaCatalogo(): void {
     if (this.filtroAnno) {
       filtri.anno = String(this.filtroAnno);
     }
+    
+    if (this.filtroTipo) {
+      filtri.tipo = this.filtroTipo;
+    }
 
-    // Passiamo solo l'oggetto 'filtri' (0-1 argomenti rispettato!)
     this.apiService.getMedia(filtri).subscribe({
       next: (data) => {
         console.log('Catalogo caricato con successo:', data);
@@ -49,8 +52,7 @@ caricaCatalogo(): void {
         console.error('Errore durante il caricamento del catalogo:', err);
       }
     });
-  }
-
+}
   eliminaFilm(id: number): void {
     if (confirm('Sei sicuro di voler eliminare permanentemente questo contenuto?')) {
       this.apiService.deleteMedia(id).subscribe({
