@@ -4,8 +4,96 @@
       <h2 class="fw-bold m-0 text-gradient">🎬 Catalogo Film & Serie TV</h2>
       <p class="text-white small m-0">Gestisci i film e le serie TV presenti nel database cloud</p>
     </div>
-    <span class="badge bg-danger px-3 py-2 rounded-pill fs-6">Live Data</span>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success rounded-pill px-3 fw-bold shadow-sm" (click)="toggleFormAggiungi()">
+        {{ mostraFormAggiungi ? '❌ Chiudi Inserimento' : '➕ Aggiungi Contenuto' }}
+      </button>
+      <span class="badge bg-danger px-3 py-2 rounded-pill fs-6 d-flex align-items-center">Live Data</span>
+    </div>
   </div>
+
+  @if (messaggioSuccesso) {
+    <div class="alert alert-success border-0 shadow mb-4">{{ messaggioSuccesso }}</div>
+  }
+  @if (messaggioErrore) {
+    <div class="alert alert-danger border-0 shadow mb-4">{{ messaggioErrore }}</div>
+  }
+
+  @if (mostraFormAggiungi) {
+    <div class="card bg-dark border-success mb-4 shadow-lg animate-fade-in">
+      <div class="card-header bg-success text-white fw-bold py-3 fs-5">✨ Inserisci un nuovo Media nel Cloud</div>
+      <div class="card-body p-4">
+        <form (ngSubmit)="salvaNuovoMedia()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-light small fw-bold">Titolo del Media *</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" 
+                     [(ngModel)]="nuovoMedia.titolo" name="titolo" required placeholder="Es. Interstellar o Breaking Bad">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label text-light small fw-bold">Anno Uscita</label>
+              <input type="number" class="form-control bg-secondary text-white border-0" 
+                     [(ngModel)]="nuovoMedia.anno_uscita" name="anno_uscita" placeholder="Es. 2024">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label text-light small fw-bold">Voto Iniziale (0-10)</label>
+              <input type="number" class="form-control bg-secondary text-white border-0" 
+                     [(ngModel)]="nuovoMedia.voto_medio" name="voto_medio" min="0" max="10" step="0.1">
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-md-6">
+              <label class="form-label text-light small fw-bold">Lingua Originale</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" 
+                     [(ngModel)]="nuovoMedia.lingua_orig" name="lingua_orig" placeholder="Es. EN, IT, FR">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-light small fw-bold">Seleziona Genere *</label>
+              <select class="form-select bg-secondary text-white border-0" [(ngModel)]="nuovoMedia.id_genere" name="id_genere" required>
+                <option value="">-- Seleziona un Genere --</option>
+                <option value="1">Azione</option>
+                <option value="2">Avventura</option>
+                <option value="3">Commedia</option>
+                <option value="4">Dramma</option>
+                <option value="5">Fantasy</option>
+                <option value="6">Horror</option>
+                <option value="7">Sci-Fi</option>
+                <option value="8">Thriller</option>
+                <option value="9">Documentario</option>
+                <option value="10">Animazione</option>
+                <option value="11">Crime</option>
+                <option value="12">Romantico</option>
+                <option value="13">Storico</option>
+                <option value="14">Biografico</option>
+                <option value="15">Musical</option>
+                <option value="16">Western</option>
+                <option value="17">Sportivo</option>
+                <option value="18">Guerra</option>
+                <option value="19">Mistero</option>
+                <option value="20">Soprannaturale</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-12 mt-3">
+            <label class="form-label text-light small fw-bold">Trama / Descrizione Completa</label>
+            <textarea class="form-control bg-secondary text-white border-0" 
+                      [(ngModel)]="nuovoMedia.trama" name="trama" rows="3" placeholder="Scrivi una breve sinossi..."></textarea>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-success rounded-pill px-4" [disabled]="staSalvando">
+              {{ staSalvando ? '⏳ Salvataggio in corso...' : '💾 Salva nel Cloud' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" (click)="toggleFormAggiungi()" [disabled]="staSalvando">
+              Annulla
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 
   <div class="card bg-dark border-secondary mb-4 shadow">
     <div class="card-body p-4">
@@ -26,6 +114,7 @@
             <option value="SerieTV">📺 Serie TV</option>
           </select>
         </div>
+        
         <div class="col-md-3">
           <label class="form-label text-light small fw-bold">Genere</label>
           <select class="form-select bg-secondary text-white border-0" 

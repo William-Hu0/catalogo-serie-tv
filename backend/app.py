@@ -294,7 +294,35 @@ def get_attore_dettaglio(id_attore):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/v3/attori', methods=['POST'])
+def add_attore():
+    try:
+        data = request.json
+        if not data or not data.get('nome'):
+            return jsonify({"error": "Il nome è obbligatorio"}), 400
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO Attore (nome, cognome, nazionalita, bio) VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql, (data['nome'], data.get('cognome'), data.get('nazionalita'), data.get('bio')))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Attore inserito con successo!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+# Cambia da /api/v1/attori/<id> a /api/v3/attori/<id>
+@app.route('/api/v3/attori/<int:id_attore>', methods=['DELETE'])
+def delete_attore(id_attore):
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "DELETE FROM Attore WHERE id_attore = %s"
+            cursor.execute(sql, (id_attore,))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Attore eliminato permanentemente!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 # =========================================================================
 # 🎥 SEZIONE 3: REGISTI
 # =========================================================================
@@ -335,6 +363,19 @@ def get_regista_dettaglio(id_regista):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/v3/registi', methods=['POST'])
+def add_regista():
+    try:
+        data = request.json
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO Regista (nome, cognome, nazionalita) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (data['nome'], data.get('cognome', ''), data.get('nazionalita', '')))
+            connection.commit()
+        connection.close()
+        return jsonify({"message": "Regista inserito con successo!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # =========================================================================
 # 🌐 SEZIONE 3.5: PIATTAFORME
@@ -344,14 +385,43 @@ def get_regista_dettaglio(id_regista):
 def get_piattaforme():
     try:
         connection = get_db_connection()
-        with connection.cursor() as cursor:
+        # CORREZIONE: Usiamo DictCursor per mappare i nomi delle colonne (id_piattaforma, nome)
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id_piattaforma, nome FROM Piattaforma ORDER BY nome")
             result = cursor.fetchall()
         connection.close()
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/v1/piattaforme/<int:id_piattaforma>', methods=['GET'])
+def get_piattaforma_dettaglio(id_piattaforma):
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM Piattaforma WHERE id_piattaforma = %s", (id_piattaforma,))
+            piattaforma = cursor.fetchone()
+            if not piattaforma:
+                connection.close()
+                return jsonify({"message": "Piattaforma non trovata"}), 404
 
+            sql_media = """
+                SELECT DISTINCT m.id_media, m.titolo, m.anno_uscita, m.trama,
+                       m.locandina_url, m.voto_medio, m.lingua_orig,
+                       CASE WHEN f.id_media IS NOT NULL THEN 'Film' ELSE 'SerieTV' END AS tipo
+                FROM Media m
+                JOIN Media_Piattaforma mp ON m.id_media = mp.id_media
+                LEFT JOIN Film f ON m.id_media = f.id_media
+                WHERE mp.id_piattaforma = %s
+                ORDER BY m.voto_medio DESC
+            """
+            cursor.execute(sql_media, (id_piattaforma,))
+            piattaforma['media'] = cursor.fetchall()
+
+        connection.close()
+        return jsonify(piattaforma), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 # =========================================================================
 # 👥 SEZIONE 4: UTENTI (Gestione Community)
 # =========================================================================
@@ -410,7 +480,6 @@ def add_utente():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ⏬ NUOVA ROTTA: MODIFICA UTENTE (PUT) ⏬
 @app.route('/api/v3/utenti/<int:id_utente>', methods=['PUT'])
 def update_utente(id_utente):
     try:
@@ -425,7 +494,6 @@ def update_utente(id_utente):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ⏬ NUOVA ROTTA: ELIMINAZIONE UTENTE (DELETE) ⏬
 @app.route('/api/v3/utenti/<int:id_utente>', methods=['DELETE'])
 def delete_utente(id_utente):
     try:

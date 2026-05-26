@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api'; // Verifica che il percorso del file api.ts sia esatto
+import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -13,7 +13,6 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./media-detail.css']
 })
 export class MediaDetail implements OnInit {
-  // Conterrà l'oggetto media completo (Film o Serie) inviato da Flask
   film: any = null;
   modifficaAttiva: boolean = false;
   formModifica: any = {};
@@ -28,7 +27,7 @@ export class MediaDetail implements OnInit {
   messaggioError: string = '';
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private apiService: ApiService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
@@ -36,7 +35,6 @@ export class MediaDetail implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Estrae l'ID numerico passato nell'URL (es. /media/4 -> id = 4)
     const id = Number(this.route.snapshot.paramMap.get('id'));
     console.log('ID estratto dalla route:', id);
     this.currentUser = this.authService.currentUser;
@@ -44,7 +42,6 @@ export class MediaDetail implements OnInit {
       this.currentUser = user;
     });
 
-    // 2. Chiamata al servizio per ottenere l'oggetto strutturato
     if (id) {
       this.loadMediaDetail(id);
     }
@@ -55,11 +52,12 @@ export class MediaDetail implements OnInit {
       next: (dati) => {
         console.log('Dati dettaglio ricevuti con successo dal database:', dati);
         this.film = dati;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Errore durante il caricamento del dettaglio media:', err);
         this.messaggioError = 'Impossibile caricare i dettagli del media. Riprova più tardi.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -105,12 +103,14 @@ export class MediaDetail implements OnInit {
         this.isSubmittingReview = false;
         setTimeout(() => {
           this.messaggioSuccess = '';
+          this.cdr.detectChanges();
         }, 2500);
       },
       error: (err) => {
         console.error('Errore durante l\'invio della recensione:', err);
         this.messaggioError = 'Errore inviando la recensione. Riprova più tardi.';
         this.isSubmittingReview = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -150,21 +150,20 @@ export class MediaDetail implements OnInit {
       next: (risposta) => {
         console.log('Media aggiornato con successo:', risposta);
         this.messaggioSuccess = 'Media aggiornato con successo! ✅';
-        
-        // Aggiorna i dati locali
         this.film = { ...this.film, ...this.formModifica };
         this.modifficaAttiva = false;
         this.staCaricando = false;
-
-        // Nascondi il messaggio dopo 2 secondi
+        this.cdr.detectChanges();
         setTimeout(() => {
           this.messaggioSuccess = '';
+          this.cdr.detectChanges();
         }, 2000);
       },
       error: (err) => {
         console.error('Errore durante l\'aggiornamento:', err);
         this.messaggioError = 'Errore nell\'aggiornamento. Riprova più tardi.';
         this.staCaricando = false;
+        this.cdr.detectChanges();
       }
     });
   }
