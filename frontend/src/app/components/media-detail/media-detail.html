@@ -32,17 +32,17 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label text-light small fw-bold">Titolo</label>
-                <input type="text" class="form-control bg-secondary text-white border-0" 
+                <input type="text" class="form-control bg-secondary text-white border-0"
                        [(ngModel)]="formModifica.titolo" name="titolo" required>
               </div>
               <div class="col-md-3">
                 <label class="form-label text-light small fw-bold">Anno Uscita</label>
-                <input type="number" class="form-control bg-secondary text-white border-0" 
+                <input type="number" class="form-control bg-secondary text-white border-0"
                        [(ngModel)]="formModifica.anno_uscita" name="anno_uscita">
               </div>
               <div class="col-md-3">
                 <label class="form-label text-light small fw-bold">Voto Medio</label>
-                <input type="number" class="form-control bg-secondary text-white border-0" 
+                <input type="number" class="form-control bg-secondary text-white border-0"
                        [(ngModel)]="formModifica.voto_medio" name="voto_medio" min="0" max="10" step="0.1">
               </div>
             </div>
@@ -50,19 +50,19 @@
             <div class="row g-3 mt-1">
               <div class="col-md-6">
                 <label class="form-label text-light small fw-bold">Lingua Originale</label>
-                <input type="text" class="form-control bg-secondary text-white border-0" 
+                <input type="text" class="form-control bg-secondary text-white border-0"
                        [(ngModel)]="formModifica.lingua_orig" name="lingua_orig">
               </div>
               <div class="col-md-6">
                 <label class="form-label text-light small fw-bold">ID Genere</label>
-                <input type="number" class="form-control bg-secondary text-white border-0" 
+                <input type="number" class="form-control bg-secondary text-white border-0"
                        [(ngModel)]="formModifica.id_genere" name="id_genere">
               </div>
             </div>
 
             <div class="col-12 mt-3">
               <label class="form-label text-light small fw-bold">Trama</label>
-              <textarea class="form-control bg-secondary text-white border-0" 
+              <textarea class="form-control bg-secondary text-white border-0"
                         [(ngModel)]="formModifica.trama" name="trama" rows="4"></textarea>
             </div>
 
@@ -78,31 +78,35 @@
         </div>
       </div>
     }
-    
+
     <div class="d-flex flex-column flex-md-row gap-4 mb-4">
-      
+
       <div class="locandina-wrapper text-center">
-        <img [src]="film.locandina_url || 'assets/placeholder.png'" 
-             alt="Locandina di {{ film.titolo }}" 
+        <img [src]="film.locandina_url || 'assets/placeholder.png'"
+             alt="Locandina di {{ film.titolo }}"
              class="img-fluid rounded shadow locandina-img">
       </div>
 
       <div class="flex-grow-1">
         <p class="info-row">
-          <strong>Anno:</strong> {{ film.anno_uscita }} | 
+          <strong>Anno:</strong> {{ film.anno_uscita }} |
           <strong>Valutazione:</strong> <span class="text-warning">⭐ {{ film.voto_medio || 'N/D' }}</span>/10
         </p>
 
-        <div class="sezione-box mb-3">
-          <strong>Disponibile su:</strong>
-          <div class="tag-list">
-            @for (p of film.piattaforme; track $index) {
-              <span class="badge-tag blue">{{ p.nome_piattaforma || 'Streaming' }}</span>
-            } @empty { 
-              <span class="text-muted small">Nessuna piattaforma associata.</span> 
-            }
+          <div class="sezione-box mb-3">
+            <strong>Disponibile su:</strong>
+            <div class="tag-list mt-1">
+              @for (p of film.piattaforme; track $index) {
+                <a [routerLink]="['/piattaforme', p.id_piattaforma]"
+                  class="badge-tag blue badge-piattaforma text-decoration-none"
+                  [title]="'Vedi tutti i contenuti su ' + (p.nome || p.nome_piattaforma)">
+                  🎬 {{ p.nome || p.nome_piattaforma || 'Streaming' }}
+                </a>
+              } @empty {
+                <span class="text-muted small">Nessuna piattaforma associata.</span>
+              }
+            </div>
           </div>
-        </div>
 
         <p class="trama mb-0">
           <strong>Trama:</strong> {{ film.trama || 'Trama non disponibile per questo contenuto.' }}
@@ -111,13 +115,13 @@
     </div>
 
     <div class="sezione-box mb-3">
-      <strong>Regia di:</strong> 
+      <strong>Regia di:</strong>
       @if (film.id_regista) {
         <a [routerLink]="['/registi', film.id_regista]" class="link-cliccabile href-link testo-esteso fw-bold text-info text-decoration-none">
           👤 {{ film.nome_regista }} {{ film.cognome_regista }}
         </a>
-      } @else { 
-        <span class="text-muted small">Regista non specificato</span> 
+      } @else {
+        <span class="text-muted small">Regista non specificato</span>
       }
     </div>
 
@@ -130,8 +134,8 @@
               👤 {{ attore.nome }} {{ attore.cognome }}
             </a>
           </div>
-        } @empty { 
-          <span class="text-muted small">Nessun attore registrato nel cast.</span> 
+        } @empty {
+          <span class="text-muted small">Nessun attore registrato nel cast.</span>
         }
       </div>
     </div>
@@ -143,34 +147,40 @@
         <h3>🎬 Informazioni Film</h3>
         <p><strong>Durata:</strong> {{ film.durata_minuti || 'N/D' }} minuti</p>
       </div>
-    } 
+    }
     @else {
-      <div class="stagioni-sezione">
-        <h3>📅 Elenco Stagioni ed Episodi</h3>
-        @for (stg of film.stagioni; track stg.id_stagione || $index) {
-          <details class="stagione-accordion" open>
-            <summary class="fw-bold">
-              Stagione {{ stg.numero_stagione }} 
-              @if (stg.titolo_stagione) { <span class="text-info font-normal"> - {{ stg.titolo_stagione }}</span> }
-            </summary>
-            <ul class="episodi-list mt-2">
-              @for (ep of stg.episodi; track ep.id_episodio || $index) {
-                <li>
-                  <span class="ep-num">Episodio {{ ep.numero_episodio }}</span> 
-                  <span class="ep-name">{{ ep.titolo_episodio }}</span>
-                  @if (ep.durata || ep.duration) { 
-                    <span class="ep-duration">⏱️ {{ ep.durata || ep.duration }} min</span> 
-                  }
-                </li>
-              } @empty { 
-                <li class="text-muted small">Nessun episodio presente per questa stagione.</li> 
-              }
-            </ul>
-          </details>
-        } @empty { 
-          <p class="text-muted small">Nessuna stagione registrata per questa serie.</p> 
-        }
-      </div>
+        <div class="stagioni-sezione">
+          <h3>📅 Elenco Stagioni ed Episodi</h3>
+          @for (stg of film.stagioni; track stg.id_stagione || $index) {
+            <details class="stagione-accordion" open>
+              <summary class="fw-bold d-flex align-items-center justify-content-between">
+                <div>
+                  Stagione {{ stg.numero_stagione || stg.numero }}
+                  @if (stg.anno) { <span class="text-muted small fw-normal">({{ stg.anno }})</span> }
+                  @if (stg.titolo_stagione) { <span class="text-info fw-normal"> - {{ stg.titolo_stagione }}</span> }
+                </div>
+                <span class="badge bg-secondary-dark border border-secondary text-muted small ms-2 px-2 py-1" style="font-size: 0.75rem;">
+                  {{ stg.n_episodi || stg.episodi?.length || 0 }} episodi
+                </span>
+              </summary>
+              <ul class="episodi-list mt-2">
+                @for (ep of stg.episodi; track ep.id_episodio || $index) {
+                  <li>
+                    <span class="ep-num">Episodio {{ ep.numero }}</span>
+                    <span class="ep-name">{{ ep.titolo }}</span>
+                    @if (ep.durata_min) {
+                      <span class="ep-duration">⏱️ {{ ep.durata_min }} min</span>
+                    }
+                  </li>
+                } @empty {
+                  <li class="text-muted small">Nessun episodio presente per questa stagione.</li>
+                }
+              </ul>
+            </details>
+          } @empty {
+            <p class="text-muted small">Nessuna stagione registrata per questa serie.</p>
+          }
+        </div>
     }
 
     <hr class="my-5 border-secondary">
@@ -232,7 +242,7 @@
     </div>
 
     <hr class="my-4 border-secondary">
-    
+
     <button routerLink="/" class="btn-back">⬅️ Torna al Catalogo</button>
   </div>
 } @else {

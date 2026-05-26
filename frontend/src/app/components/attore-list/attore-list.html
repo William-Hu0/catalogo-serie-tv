@@ -4,8 +4,60 @@
       <h2 class="fw-bold m-0 text-gradient">🎭 Elenco Attori & Cast</h2>
       <p class="text-muted small m-0">Gestisci le celebrità e le star presenti nel database cloud</p>
     </div>
-    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6">Hollywood DB</span>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-warning px-3 py-2 rounded-pill fw-bold text-dark d-flex align-items-center gap-2" (click)="toggleFormAggiungi()">
+        {{ mostraFormAggiungi ? '✖️ Chiudi Pannello' : '➕ Aggiungi Attore' }}
+      </button>
+      <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6">Hollywood DB</span>
+    </div>
   </div>
+
+  @if (messaggioSuccesso) {
+    <div class="alert alert-success bg-success text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioSuccesso }}
+    </div>
+  }
+  @if (messaggioErrore) {
+    <div class="alert alert-danger bg-danger text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioErrore }}
+    </div>
+  }
+
+  @if (mostraFormAggiungi) {
+    <div class="card bg-dark border-warning mb-4 shadow">
+      <div class="card-body p-4 text-white">
+        <h4 class="fw-bold text-warning mb-3">👤 Nuovo Attore</h4>
+        <form (ngSubmit)="salvaNuovoAttore()">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nome *</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.nome" name="nome" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Cognome</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.cognome" name="cognome">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nazionalità</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.nazionalita" name="nazionalita">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label small fw-bold text-light">Biografia (Bio)</label>
+              <textarea class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.bio" name="bio" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-warning px-4 rounded-pill fw-bold text-dark" [disabled]="staSalvando">
+              {{ staSalvando ? '⏳ Salvataggio...' : '💾 Salva nel Cloud' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary px-4 rounded-pill text-white" (click)="toggleFormAggiungi()">
+              Annulla
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
 
   <div class="card bg-dark border-secondary mb-4 shadow">
     <div class="card-body p-4">
