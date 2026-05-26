@@ -5,6 +5,7 @@ import { AttoreList } from './components/attore-list/attore-list';
 import { AttoreDetail } from './components/attore-detail/attore-detail';
 import { RegistaList } from './components/regista-list/regista-list';
 import { RegistaDetail } from './components/regista-detail/regista-detail';
+import { LoginComponent } from './components/login/login';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'media', pathMatch: 'full' },
@@ -14,5 +15,6 @@ export const routes: Routes = [
   { path: 'attori/:id', component: AttoreDetail },
   { path: 'registi', component: RegistaList },
   { path: 'registi/:id', component: RegistaDetail },
+  { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: 'media' }
 ];

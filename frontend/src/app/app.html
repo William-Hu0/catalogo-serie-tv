@@ -5,6 +5,14 @@
       <li><a routerLink="/media" routerLinkActive="active-link">Catalogo Media</a></li>
       <li><a routerLink="/attori" routerLinkActive="active-link">Attori</a></li>
       <li><a routerLink="/registi" routerLinkActive="active-link">Registi</a></li>
+      @if (authService.isLoggedIn) {
+        <li class="nav-user">Ciao, {{ authService.currentUser.username }}</li>
+        <li>
+          <button class="btn btn-outline-secondary logout-btn" type="button" (click)="logout()">Esci</button>
+        </li>
+      } @else {
+        <li><a routerLink="/login" routerLinkActive="active-link">Accedi</a></li>
+      }
     </ul>
   </div>
 </nav>

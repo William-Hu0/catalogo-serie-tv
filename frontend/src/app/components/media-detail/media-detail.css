@@ -242,6 +242,14 @@ textarea.form-control {
   margin-top: 2rem;
 }
 
+.review-form {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.review-form .card-title {
+  margin-bottom: 0.75rem;
+}
+
 .btn-back {
   display: inline-block;
   margin-top: 2rem;

@@ -60,6 +60,17 @@
                  [(ngModel)]="filtroAnno" (input)="caricaCatalogo()" 
                  placeholder="Anno di uscita">
         </div>
+
+        <div class="col-md-3">
+          <label class="form-label text-light small fw-bold">Piattaforma Streaming</label>
+          <select class="form-select bg-secondary text-white border-0" 
+                  [(ngModel)]="filtroPiattaforma" (change)="caricaCatalogo()">
+            <option value="">Tutte le piattaforme</option>
+            @for (piattaforma of elencoPiattaforme; track piattaforma.id_piattaforma) {
+              <option [value]="piattaforma.id_piattaforma">{{ piattaforma.nome }}</option>
+            }
+          </select>
+        </div>
       </div>
     </div>
   </div>

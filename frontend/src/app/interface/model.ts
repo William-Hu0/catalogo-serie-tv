@@ -25,7 +25,6 @@ export interface Attore {
   data_nascita?: string; // Formato YYYY-MM-DD da SQL
   nazionalita?: string;
   bio?: string;
-  filmografia?: any[];
 }
 
 export interface Regista {

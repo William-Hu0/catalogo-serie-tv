@@ -1,4 +1,5 @@
 import os
+import hashlib
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pymysql
@@ -40,45 +41,58 @@ def home():
 # 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
 # =========================================================================
 
-# L1 & L2: LISTA MEDIA + FILTRI AVANZATI (TITOLO, GENERE, ANNO E TIPO)
+# L1 & L2: LISTA MEDIA + FILTRI AVANZATI (TITOLO, GENERE, ANNO, TIPO E PIATTAFORMA)
 @app.route('/api/v1/media', methods=['GET'])
 def get_all_media():
     try:
         titolo_cercato = request.args.get('titolo')
         id_genere_filtrato = request.args.get('id_genere')
         anno_cercato = request.args.get('anno')
-        tipo_cercato = request.args.get('tipo') 
+        tipo_cercato = request.args.get('tipo')
+        id_piattaforma_filtrato = request.args.get('id_piattaforma')
         
         connection = get_db_connection()
         with connection.cursor() as cursor:
             # Costruiamo la query base per Media
-            sql = "SELECT * FROM Media WHERE 1=1"
+            sql = "SELECT DISTINCT m.* FROM Media m"
             params = []
+            
+            # Aggiunge JOIN se c'è filtro piattaforma
+            if id_piattaforma_filtrato:
+                sql += " JOIN Media_Piattaforma mp ON m.id_media = mp.id_media"
+            
+            sql += " WHERE 1=1"
             
             # Filtro per Titolo
             if titolo_cercato:
-                sql += " AND titolo LIKE %s"
+                sql += " AND m.titolo LIKE %s"
                 params.append(f"%{titolo_cercato}%")
                 
             # Filtro per Genere
             if id_genere_filtrato:
-                sql += " AND id_genere = %s"
+                sql += " AND m.id_genere = %s"
                 params.append(int(id_genere_filtrato))
                 
             # Filtro per Anno di Uscita
             if anno_cercato:
-                sql += " AND anno_uscita = %s"
+                sql += " AND m.anno_uscita = %s"
                 params.append(int(anno_cercato))
             
-            # Filtro per Tipo (Film o SerieTV) controllando le tabelle gemelle
+            # Filtro per Tipo (Film o SerieTV)
             if tipo_cercato:
                 if tipo_cercato == 'Film':
-                    sql += " AND id_media IN (SELECT id_media FROM Film)"
+                    sql += " AND m.id_media IN (SELECT id_media FROM Film)"
                 elif tipo_cercato == 'SerieTV':
                     sql += """ AND (
-                        id_media IN (SELECT id_media FROM SerieTV) 
-                        OR id_media IN (SELECT id_media FROM Stagione)
+                        m.id_media IN (SELECT id_media FROM SerieTV) 
+                        OR m.id_media IN (SELECT id_media FROM Stagione)
                     )"""
+            
+            # Filtro per Piattaforma
+            if id_piattaforma_filtrato:
+                sql += " AND mp.id_piattaforma = %s"
+                params.append(int(id_piattaforma_filtrato))
+            
             cursor.execute(sql, params)
             result = cursor.fetchall()
             
@@ -323,6 +337,22 @@ def get_regista_dettaglio(id_regista):
 
 
 # =========================================================================
+# 🌐 SEZIONE 3.5: PIATTAFORME
+# =========================================================================
+
+@app.route('/api/v1/piattaforme', methods=['GET'])
+def get_piattaforme():
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_piattaforma, nome FROM Piattaforma ORDER BY nome")
+            result = cursor.fetchall()
+        connection.close()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# =========================================================================
 # 👥 SEZIONE 4: UTENTI (Gestione Community)
 # =========================================================================
 
@@ -331,10 +361,33 @@ def get_all_utenti():
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM Utente ORDER BY id_utente DESC")
+            cursor.execute("SELECT id_utente, username, email, data_iscrizione, paese, eta FROM Utente ORDER BY id_utente DESC")
             result = cursor.fetchall()
         connection.close()
         return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/v1/login', methods=['POST'])
+def login():
+    try:
+        data = request.json
+        username = data.get('username')
+        password = data.get('password')
+        if not username or not password:
+            return jsonify({"error": "Username e password sono obbligatori."}), 400
+
+        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = "SELECT id_utente, username, email FROM Utente WHERE username = %s AND password_hash = %s"
+            cursor.execute(sql, (username, password_hash))
+            user = cursor.fetchone()
+        connection.close()
+
+        if user:
+            return jsonify(user), 200
+        return jsonify({"error": "Credenziali non valide."}), 401
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -342,10 +395,15 @@ def get_all_utenti():
 def add_utente():
     try:
         data = request.json
+        password = data.get('password')
+        if not password:
+            return jsonify({"error": "La password è obbligatoria."}), 400
+
+        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            sql = "INSERT INTO Utente (username, email) VALUES (%s, %s)"
-            cursor.execute(sql, (data['username'], data['email']))
+            sql = "INSERT INTO Utente (username, email, password_hash, data_iscrizione) VALUES (%s, %s, %s, CURDATE())"
+            cursor.execute(sql, (data['username'], data['email'], password_hash))
             connection.commit()
         connection.close()
         return jsonify({"message": "Utente registrato con successo!"}), 201
@@ -411,10 +469,10 @@ def add_recensione():
         data = request.json
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            # Corretto l'inserimento usando la colonna 'testo' al posto di 'commento'
+            # Inserimento con campo data_rec obbligatorio
             sql = """
-                INSERT INTO Recensione (voto, testo, id_utente, id_media) 
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO Recensione (voto, testo, id_utente, id_media, data_rec) 
+                VALUES (%s, %s, %s, %s, CURDATE())
             """
             cursor.execute(sql, (int(data['voto']), data.get('testo', ''), 
                                  int(data['id_utente']), int(data['id_media'])))
@@ -422,6 +480,8 @@ def add_recensione():
         connection.close()
         return jsonify({"message": "Recensione inserita con successo!"}), 201
     except Exception as e:
+        if 'Duplicate entry' in str(e):
+            return jsonify({"error": "Hai già recensito questo contenuto."}), 409
         return jsonify({"error": str(e)}), 500
 
 # ⏬ NUOVA ROTTA: MODIFICA RECENSIONE (PUT) ⏬

@@ -40,6 +40,18 @@ export class ApiService {
     return this.http.put<any>(`${this.baseUrl}/v3/media/${id}`, media);
   }
 
+  addRecensione(recensione: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v3/recensioni`, recensione);
+  }
+
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v1/login`, credentials);
+  }
+
+  registerUser(user: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/v3/utenti`, user);
+  }
+
   deleteMedia(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/v3/media/${id}`);
   }
@@ -98,5 +110,9 @@ export class ApiService {
   // AGGIUNTO: Eliminazione Regista (DELETE)
   deleteRegista(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/v3/registi/${id}`);
+  }
+
+  getPiattaforme(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/v1/piattaforme`);
   }
 }

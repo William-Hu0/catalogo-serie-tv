@@ -12,54 +12,47 @@ import { ApiService } from '../../services/api';
   styleUrls: ['./media-list.css']
 })
 export class MediaListComponent implements OnInit {
-  // Variabili collegate tramite [(ngModel)] al tuo HTML
   filtroTitolo: string = '';
   filtroGenere: string = '';
   filtroAnno: string = '';
   filtroTipo: string = '';
-  
+  filtroPiattaforma: string = '';
+
   elencoMedia: any[] = [];
+  elencoPiattaforme: any[] = [];
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
+    this.caricaPiattaforme(); 
     this.caricaCatalogo();
   }
 
-caricaCatalogo(): void {
-    const filtri: any = {};
+  caricaPiattaforme(): void { 
+    this.apiService.getPiattaforme().subscribe({
+      next: (data) => { this.elencoPiattaforme = data; },
+      error: (err) => console.error('Errore caricamento piattaforme:', err)
+    });
+  }
 
-    if (this.filtroTitolo && this.filtroTitolo.trim()) {
-      filtri.titolo = this.filtroTitolo.trim();
-    }
-    if (this.filtroGenere) {
-      filtri.id_genere = this.filtroGenere;
-    }
-    if (this.filtroAnno) {
-      filtri.anno = String(this.filtroAnno);
-    }
-    
-    if (this.filtroTipo) {
-      filtri.tipo = this.filtroTipo;
-    }
+  caricaCatalogo(): void {
+    const filtri: any = {};
+    if (this.filtroTitolo?.trim()) filtri.titolo = this.filtroTitolo.trim();
+    if (this.filtroGenere)        filtri.id_genere = this.filtroGenere;
+    if (this.filtroAnno)          filtri.anno = String(this.filtroAnno);
+    if (this.filtroTipo)          filtri.tipo = this.filtroTipo;
+    if (this.filtroPiattaforma)   filtri.id_piattaforma = String(this.filtroPiattaforma);
 
     this.apiService.getMedia(filtri).subscribe({
-      next: (data) => {
-        console.log('Catalogo caricato con successo:', data);
-        this.elencoMedia = data;
-      },
-      error: (err) => {
-        console.error('Errore durante il caricamento del catalogo:', err);
-      }
+      next: (data) => { this.elencoMedia = data; },
+      error: (err) => console.error('Errore caricamento catalogo:', err)
     });
-}
+  }
+
   eliminaFilm(id: number): void {
     if (confirm('Sei sicuro di voler eliminare permanentemente questo contenuto?')) {
       this.apiService.deleteMedia(id).subscribe({
-        next: () => {
-          console.log('Media eliminato:', id);
-          this.caricaCatalogo(); // Rinfresca la tabella
-        },
+        next: () => this.caricaCatalogo(),
         error: (err) => console.error('Errore eliminazione:', err)
       });
     }
