@@ -1,0 +1,297 @@
+.detail-card {
+  background: linear-gradient(135deg, rgba(30, 30, 46, 0.9) 0%, rgba(45, 45, 65, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #e0e0e0;
+}
+
+.header-inline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.badge-tipo {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.badge-tipo.bg-film {
+  background-color: #dc3545;
+  color: white;
+}
+
+.badge-tipo.bg-serie {
+  background-color: #0dcaf0;
+  color: white;
+}
+
+.alert {
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.alert-success {
+  background-color: rgba(25, 135, 84, 0.2);
+  border: 1px solid #198754;
+  color: #84d593;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.2);
+  border: 1px solid #dc3545;
+  color: #f8949a;
+}
+
+.btn-outline-warning {
+  color: #ffc107;
+  border-color: #ffc107;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.btn-outline-success {
+  color: #198754;
+  border-color: #198754;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-success:hover {
+  background-color: #198754;
+  color: white;
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #6c757d;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0;
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control,
+.form-select {
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  background-color: #555;
+  color: white;
+}
+
+textarea.form-control {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.info-row {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.sezione-box {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid #ffc107;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.badge-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge-tag.blue {
+  background-color: rgba(13, 110, 253, 0.3);
+  color: #66b3ff;
+  border: 1px solid #0d6efd;
+}
+
+.badge-tag.grey {
+  background-color: rgba(108, 117, 125, 0.3);
+  color: #adb5bd;
+  border: 1px solid #6c757d;
+  text-decoration: none;
+}
+
+.href-link:hover {
+  text-decoration: underline !important;
+  opacity: 0.8;
+}
+
+.trama {
+  line-height: 1.6;
+  color: #d0d0d0;
+}
+
+.locandina-wrapper {
+  flex-basis: 200px;
+  flex-shrink: 0;
+}
+
+.locandina-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.stagione-accordion {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.stagione-accordion summary {
+  outline: none;
+  user-select: none;
+  color: #ffc107;
+}
+
+.stagione-accordion summary:hover {
+  color: #ffdb4d;
+}
+
+.episodi-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.episodi-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d0d0d0;
+  font-size: 0.9rem;
+}
+
+.episodi-list li:last-child {
+  border-bottom: none;
+}
+
+.ep-num {
+  font-weight: bold;
+  color: #66b3ff;
+  margin-right: 0.5rem;
+}
+
+.ep-name {
+  color: #e0e0e0;
+}
+
+.ep-duration {
+  float: right;
+  color: #adb5bd;
+  font-size: 0.85rem;
+}
+
+.reviews-section {
+  margin-top: 2rem;
+}
+
+.review-form {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.review-form .card-title {
+  margin-bottom: 0.75rem;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-back:hover {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.loading-box {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.badge-piattaforma {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  border: 1px solid rgba(96, 165, 250, 0.25);
+}
+ 
+.badge-piattaforma:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.25);
+  background: rgba(96, 165, 250, 0.25) !important;
+  color: #bfdbfe !important;
+  border-color: rgba(96, 165, 250, 0.5);
+}
+ 
+.badge-piattaforma:active {
+  transform: translateY(0);
+}

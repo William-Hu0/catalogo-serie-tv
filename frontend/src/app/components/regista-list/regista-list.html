@@ -1,0 +1,112 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <div>
+      <h2 class="fw-bold m-0 text-gradient">🎥 Registi & Creator</h2>
+      <p class="text-muted small m-0">Gestisci i registi delle opere presenti nel database cloud</p>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-info px-3 py-2 rounded-pill fw-bold text-dark d-flex align-items-center gap-2" (click)="toggleFormAggiungi()">
+        {{ mostraFormAggiungi ? '✖️ Chiudi Pannello' : '➕ Aggiungi Regista' }}
+      </button>
+      <span class="badge bg-info text-dark px-3 py-2 rounded-pill fs-6">Behind the Camera</span>
+    </div>
+  </div>
+
+  @if (messaggioSuccesso) {
+    <div class="alert alert-success bg-success text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioSuccesso }}
+    </div>
+  }
+  @if (messaggioErrore) {
+    <div class="alert alert-danger bg-danger text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioErrore }}
+    </div>
+  }
+
+  @if (mostraFormAggiungi) {
+    <div class="card bg-dark border-info mb-4 shadow animate-fade-in animate-border">
+      <div class="card-body p-4 text-white">
+        <h4 class="fw-bold text-info mb-3">🎬 Nuovo Regista</h4>
+        <form (ngSubmit)="salvaNuovoRegista()">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nome *</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoRegista.nome" name="nome" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Cognome</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoRegista.cognome" name="cognome">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nazionalità</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoRegista.nazionalita" name="nazionalita" placeholder="Es. Statunitense">
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-info px-4 rounded-pill fw-bold text-dark" [disabled]="staSalvando">
+              {{ staSalvando ? '⏳ Salvataggio...' : '💾 Salva nel Cloud' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary px-4 rounded-pill text-white" (click)="toggleFormAggiungi()">
+              Annulla
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card bg-dark border-secondary mb-4 shadow">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label text-light small fw-bold">Cerca Regista per Nome</label>
+          <input type="text" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroNomeRegista" (input)="caricaRegisti()" 
+                 placeholder="Es. Christopher Nolan, Quentin Tarantino...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary shadow overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle m-0 text-center">
+        <thead class="table-secondary text-uppercase fs-7 tracking-wider">
+          <tr>
+            <th scope="col" class="py-3">ID</th>
+            <th scope="col" class="py-3 text-start ps-4">Nome Regista</th>
+            <th scope="col" class="py-3">Nazionalità</th>
+            <th scope="col" class="py-3">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (regista of elencoRegisti; track regista.id_regista) {
+            <tr>
+              <td class="text-muted fw-bold">#{{ regista.id_regista }}</td>
+              <td class="text-start fw-semibold ps-4">
+                <a [routerLink]="['/registi', regista.id_regista]" class="text-info text-decoration-none href-link testo-esteso fw-bold">
+                  🎥 {{ regista.nome }} {{ regista.cognome }}
+                </a>
+              </td>
+              <td><span class="badge bg-secondary">{{ regista.nazionalita || 'N/D' }}</span></td>
+              <td>
+                <button class="btn btn-sm btn-outline-warning px-3 rounded-pill me-2" [routerLink]="['/registi', regista.id_regista]">
+                  ✏️ Modifica
+                </button>
+                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaRegista(regista.id_regista)">
+                  ❌ Elimina
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="py-5 text-muted">
+                Nessun regista trovato nel database.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

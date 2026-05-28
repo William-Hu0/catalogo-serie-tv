@@ -1,0 +1,22 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { MediaListComponent } from './media-list';
+
+describe('MediaListComponent', () => {
+  let component: MediaListComponent;
+  let fixture: ComponentFixture<MediaListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [MediaListComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(MediaListComponent);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

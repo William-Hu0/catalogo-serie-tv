@@ -1,0 +1,58 @@
+<div class="login-page">
+  <div class="login-card">
+    <h2 class="text-warning mb-3">{{ mode === 'login' ? 'Accedi' : 'Registrati' }}</h2>
+
+    <div class=" text-white-50 mb-3 p-3 bg-warning bg-opacity-10 rounded small">
+      <strong>⚠️ Password errata nel DB</strong>
+      <p class="mb-0 mt-1">Gli utenti nel database hanno password hashate non verificabili. Per testare, registrati con un nuovo account.</p>
+    </div>
+
+    <div class="mb-4">
+      <button class="btn btn-outline-warning me-2" type="button" (click)="switchMode('login')"
+              [class.active]="mode === 'login'">Login</button>
+      <button class="btn btn-outline-warning" type="button" (click)="switchMode('register')"
+              [class.active]="mode === 'register'">Registrazione</button>
+    </div>
+
+    @if (messaggioSuccess) {
+      <div class="alert alert-success" role="alert">{{ messaggioSuccess }}</div>
+    }
+    @if (messaggioError) {
+      <div class="alert alert-danger" role="alert">{{ messaggioError }}</div>
+    }
+
+    <form (ngSubmit)="submit()">
+      <div class="text-white-50 mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" [(ngModel)]="form.username" name="username" 
+               placeholder="Inserisci il tuo username" required>
+      </div>
+
+      @if (mode === 'register') {
+        <div class="text-white-50  mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" [(ngModel)]="form.email" name="email" 
+                 placeholder="Inserisci la tua email (es: user@example.com)" required>
+        </div>
+      }
+
+      <div class="text-white-50  mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" [(ngModel)]="form.password" name="password" 
+               placeholder="Inserisci una password sicura (almeno 6 caratteri)" required>
+      </div>
+
+      @if (mode === 'register') {
+        <div class="mb-3">
+          <label class="form-label">Conferma password</label>
+          <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" 
+                 placeholder="Ripeti la password" required>
+        </div>
+      }
+
+      <button type="submit" class="btn btn-outline-success w-100" [disabled]="staCaricando">
+        {{ staCaricando ? '⏳ Caricamento...' : mode === 'login' ? 'Accedi' : 'Registrati' }}
+      </button>
+    </form>
+  </div>
+</div>

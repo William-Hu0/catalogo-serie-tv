@@ -1,0 +1,118 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 text-white">
+    <div>
+      <h2 class="fw-bold m-0 text-gradient">🎭 Elenco Attori & Cast</h2>
+      <p class="text-muted small m-0">Gestisci le celebrità e le star presenti nel database cloud</p>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-warning px-3 py-2 rounded-pill fw-bold text-dark d-flex align-items-center gap-2" (click)="toggleFormAggiungi()">
+        {{ mostraFormAggiungi ? '✖️ Chiudi Pannello' : '➕ Aggiungi Attore' }}
+      </button>
+      <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6">Hollywood DB</span>
+    </div>
+  </div>
+
+  @if (messaggioSuccesso) {
+    <div class="alert alert-success bg-success text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioSuccesso }}
+    </div>
+  }
+  @if (messaggioErrore) {
+    <div class="alert alert-danger bg-danger text-white border-0 shadow mb-4" role="alert">
+      {{ messaggioErrore }}
+    </div>
+  }
+
+  @if (mostraFormAggiungi) {
+    <div class="card bg-dark border-warning mb-4 shadow">
+      <div class="card-body p-4 text-white">
+        <h4 class="fw-bold text-warning mb-3">👤 Nuovo Attore</h4>
+        <form (ngSubmit)="salvaNuovoAttore()">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nome *</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.nome" name="nome" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Cognome</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.cognome" name="cognome">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold text-light">Nazionalità</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.nazionalita" name="nazionalita">
+            </div>
+            <div class="col-md-12">
+              <label class="form-label small fw-bold text-light">Biografia (Bio)</label>
+              <textarea class="form-control bg-secondary text-white border-0" [(ngModel)]="nuovoAttore.bio" name="bio" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-warning px-4 rounded-pill fw-bold text-dark" [disabled]="staSalvando">
+              {{ staSalvando ? '⏳ Salvataggio...' : '💾 Salva nel Cloud' }}
+            </button>
+            <button type="button" class="btn btn-outline-secondary px-4 rounded-pill text-white" (click)="toggleFormAggiungi()">
+              Annulla
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card bg-dark border-secondary mb-4 shadow">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label text-light small fw-bold">Cerca Attore per Nome</label>
+          <input type="text" class="form-control bg-secondary text-white border-0" 
+                 [(ngModel)]="filtroNome" (input)="caricaAttori()" 
+                 placeholder="Es. Pedro Pascal, Millie Bobby Brown...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-dark border-secondary shadow overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle m-0 text-center">
+        <thead class="table-secondary text-uppercase fs-7 tracking-wider">
+          <tr>
+            <th scope="col" class="py-3">ID</th>
+            <th scope="col" class="py-3 text-start ps-4">Nome e Cognome</th>
+            <th scope="col" class="py-3">Nazionalità</th>
+            <th scope="col" class="py-3">Data di Nascita</th>
+            <th scope="col" class="py-3">Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (attore of elencoAttori; track attore.id_attore) {
+            <tr>
+              <td class="text-muted fw-bold">#{{ attore.id_attore }}</td>
+              <td class="text-start fw-semibold ps-4">
+                <a [routerLink]="['/attori', attore.id_attore]" class="text-info text-decoration-none href-link testo-esteso fw-bold">
+                  👤 {{ attore.nome }} {{ attore.cognome }}
+                </a>
+              </td>
+              <td><span class="badge bg-secondary">{{ attore.nazionalita || 'N/D' }}</span></td>
+              <td class="text-muted">{{ (attore.data_nascita | date:'dd/MM/yyyy') || 'N/D' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-warning px-3 rounded-pill me-2" [routerLink]="['/attori', attore.id_attore]">
+                  ✏️ Modifica
+                </button>
+                <button class="btn btn-sm btn-outline-danger px-3 rounded-pill" (click)="eliminaAttore(attore.id_attore)">
+                  ❌ Elimina
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="py-5 text-muted">
+                Nessun attore trovato nel database.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

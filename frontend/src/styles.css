@@ -1,1 +1,109 @@
-/* You can add global styles to this file, and also import other style files */
+.navbar {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.nav-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.nav-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e50914;
+  text-decoration: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: #f8f9fa;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.nav-links a:hover {
+  background-color: #333333;
+  color: #ffffff;
+}
+
+.active-link {
+  background-color: #e50914 !important;
+  color: white !important;
+}
+
+.main-content {
+  padding: 20px;
+}
+.testo-esteso, .href-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;   /* IMPEDISCE il ritorno a capo del cognome */
+  flex-wrap: nowrap !important;
+  gap: 5px;                         /* Spazio fisso tra emoji e testo */
+}
+
+/* 2. Forza i titoli H2 delle pagine di dettaglio (es. Tom Hanks) */
+.header-inline h2, .detail-card h2 {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;   /* Blocca il nome e il cognome uniti */
+  flex-wrap: nowrap !important;
+  gap: 10px;
+}
+
+/* 3. Sicurezza per le celle della tabella delle liste */
+table.table td {
+  white-space: nowrap !important;   /* Evita che la cella si stringa forzando il testo in verticale */
+  vertical-align: middle !important;
+}
+
+.tag-list-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+.bg-secondary-dark {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px;
+}
+
+.italic {
+  font-style: italic;
+}
+.bg-dark-soft {
+  background-color: rgba(255, 255, 255, 0.85) !important; /* Sfondo chiaro per far leggere il testo nero */
+}
+.bio-text {
+  color: #ffffff !important;          /* FORZA IL COLORE NERO ASSOLUTO */
+  white-space: normal !important;      /* Permette il ritorno a capo */
+  word-break: break-word !important;   /* Evita che le parole escano dal box */
+  line-height: 1.6;                    /* Spaziatura di lettura ideale */
+  font-size: 0.95rem;
+  font-weight: 500;                    /* Un briciolo più spesso per migliorarne la leggibilità */
+  text-align: justify;
+}
+.p{
+  color:#ffffff
+}

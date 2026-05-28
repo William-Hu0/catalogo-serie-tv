@@ -1,0 +1,107 @@
+@if (attore) {
+  <div class="detail-card">
+    <div class="header-inline">
+      <h2>👤 {{ attore.nome }} {{ attore.cognome }}</h2>
+    </div>
+
+    @if (messaggioSuccess) {
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ messaggioSuccess }}
+      </div>
+    }
+    @if (messaggioError) {
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ messaggioError }}
+      </div>
+    }
+
+    @if (!modifficaAttiva) {
+      <div class="mb-4">
+        <button class="btn btn-outline-warning me-2" (click)="attivaModifica()">
+          ✏️ Modifica
+        </button>
+      </div>
+    } @else {
+      <div class="card bg-dark border-warning mb-4 shadow">
+        <div class="card-header bg-warning text-dark fw-bold">Modifica Attore</div>
+        <div class="card-body">
+          <form (ngSubmit)="salvaModifica()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-light small fw-bold">Nome</label>
+                <input type="text" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.nome" name="nome" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-light small fw-bold">Cognome</label>
+                <input type="text" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.cognome" name="cognome" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+              <div class="col-md-12">
+                <label class="form-label text-light small fw-bold">Nazionalità</label>
+                <input type="text" class="form-control bg-secondary text-white border-0" 
+                       [(ngModel)]="formModifica.nazionalita" name="nazionalita">
+              </div>
+            </div>
+
+            <div class="col-12 mt-3">
+              <label class="form-label text-light small fw-bold">Biografia</label>
+              <textarea class="form-control bg-secondary text-white border-0" 
+                        [(ngModel)]="formModifica.bio" name="bio" rows="4"></textarea>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button type="submit" class="btn btn-outline-success" [disabled]="staCaricando">
+                {{ staCaricando ? '⏳ Salvataggio...' : '💾 Salva Modifiche' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="annullaModifica()" [disabled]="staCaricando">
+                ❌ Annulla
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <p class="info-row">
+      <strong>Nazionalità:</strong> {{ attore.nazionalita || 'N/D' }}
+    </p>
+
+    <div class="bio-container mt-4 p-3 bg-dark-soft rounded border-start border-warning border-4">
+      <h5 class="text-warning small text-uppercase fw-bold mb-2">📝 Biografia</h5>
+      <p class="m-0 bio-text">
+          {{ attore.bio || 'Nessuna biografia disponibile per questo attore nel database cloud.' }}
+      </p>
+    </div>
+
+    <hr class="my-4 border-secondary">
+
+    <div class="media-correlati">
+      <h3>🎬 Ha recitato in:</h3>
+      <div class="tag-list-vertical mt-3">
+        @for (item of attore.filmografia; track item.id_media || $index) {
+          <div class="media-item-link mb-2">
+            <a [routerLink]="['/media', item.id_media]" class="link-cliccabile href-link testo-esteso fw-bold text-info text-decoration-none">
+              🍿 {{ item.titolo }}
+            </a>
+            <span class="text-muted small"> ({{ item.anno_uscita }} - {{ item.tipo === 'SerieTV' ? 'Serie TV' : 'Film' }})</span>
+          </div>
+        } @empty {
+          <p class="text-muted small">Nessun film o serie TV associata a questo attore nel database.</p>
+        }
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+    
+    <button routerLink="/attori" class="btn-back">⬅️ Torna alla lista attori</button>
+  </div>
+} @else {
+  <div class="loading-box text-center py-5">
+    <div class="spinner-border text-danger mb-2" role="status"></div>
+    <p class="text-muted">Caricamento dati attore in corso...</p>
+  </div>
+}
