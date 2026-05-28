@@ -12,10 +12,9 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  // =========================================================================
-  // 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
-  // =========================================================================
   
+  // 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
+
   // Ottiene l'elenco includendo il filtro correttivo sul "tipo" (Film o SerieTV)
   getMedia(filtri?: any): Observable<any[]> {
     let params = new HttpParams();
@@ -57,9 +56,9 @@ export class ApiService {
     return this.http.delete<any>(`${this.baseUrl}/v3/media/${id}`);
   }
 
-  // =========================================================================
+ 
   // 🎭 SEZIONE 2: ATTORI (CRUD COMPLETO)
-  // =========================================================================
+
   getAttori(nome?: string): Observable<any[]> {
     let params = new HttpParams();
     if (nome) params = params.set('nome', nome);
@@ -85,9 +84,9 @@ export class ApiService {
     return this.http.delete<any>(`${this.baseUrl}/v3/attori/${id}`);
   }
 
-  // =========================================================================
+ 
   // 🎥 SEZIONE 3: REGISTI (CRUD COMPLETO)
-  // =========================================================================
+  
   getRegisti(nome?: string): Observable<any[]> {
     let params = new HttpParams();
     if (nome) params = params.set('nome', nome);

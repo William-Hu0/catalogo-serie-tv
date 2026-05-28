@@ -23,7 +23,7 @@ def get_db_connection():
         database=os.getenv("TIDB_DB_NAME"),
         ssl_verify_cert=True,
         ssl_verify_identity=True,
-        # Restituisce i record come dizionari (es. {"titolo": "Inception"}) pronti per Angular
+        # Restituisce i record come dizionari pronti per Angular
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -37,9 +37,7 @@ def home():
     }), 200
 
 
-# =========================================================================
 # 🎬 SEZIONE 1: MEDIA (FILM & SERIE TV)
-# =========================================================================
 
 # L1 & L2: LISTA MEDIA + FILTRI AVANZATI (TITOLO, GENERE, ANNO, TIPO E PIATTAFORMA)
 @app.route('/api/v1/media', methods=['GET'])
@@ -227,10 +225,7 @@ def delete_media(id_media):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# =========================================================================
 # 🎭 SEZIONE 2: ATTORI
-# =========================================================================
 
 # L1 & L2: LISTA ATTORI + FILTRO DI RICERCA SUL NOME
 @app.route('/api/v1/attori', methods=['GET'])
@@ -323,9 +318,8 @@ def delete_attore(id_attore):
         return jsonify({"message": "Attore eliminato permanentemente!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-# =========================================================================
+
 # 🎥 SEZIONE 3: REGISTI
-# =========================================================================
 
 # L1 & L2: LISTA REGISTI + FILTRO DI RICERCA SUL NOME
 @app.route('/api/v1/registi', methods=['GET'])
@@ -377,9 +371,9 @@ def add_regista():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# =========================================================================
+
 # 🌐 SEZIONE 3.5: PIATTAFORME
-# =========================================================================
+
 
 @app.route('/api/v1/piattaforme', methods=['GET'])
 def get_piattaforme():
@@ -422,9 +416,9 @@ def get_piattaforma_dettaglio(id_piattaforma):
         return jsonify(piattaforma), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-# =========================================================================
+
 # 👥 SEZIONE 4: UTENTI (Gestione Community)
-# =========================================================================
+
 
 @app.route('/api/v1/utenti', methods=['GET'])
 def get_all_utenti():
@@ -442,44 +436,69 @@ def get_all_utenti():
 def login():
     try:
         data = request.json
-        username = data.get('username')
-        password = data.get('password')
+        if not data:
+            return jsonify({"error": "Dati mancanti."}), 400
+            
+        username = data.get('username', '').strip()
+        password = data.get('password', '')
+        
         if not username or not password:
             return jsonify({"error": "Username e password sono obbligatori."}), 400
 
+        # Cifratura SHA-256 della password inviata da Angular
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            sql = "SELECT id_utente, username, email FROM Utente WHERE username = %s AND password_hash = %s"
+            # Estraiamo anche i dati di controllo
+            sql = "SELECT id_utente, username, email, paese, eta FROM Utente WHERE username = %s AND password_hash = %s"
             cursor.execute(sql, (username, password_hash))
             user = cursor.fetchone()
         connection.close()
 
         if user:
             return jsonify(user), 200
-        return jsonify({"error": "Credenziali non valide."}), 401
+        return jsonify({"error": "Credenziali non valide. Controlla username e password."}), 401
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Errore del database: {str(e)}"}), 500
+
 
 @app.route('/api/v3/utenti', methods=['POST'])
 def add_utente():
     try:
         data = request.json
-        password = data.get('password')
-        if not password:
-            return jsonify({"error": "La password è obbligatoria."}), 400
+        if not data:
+            return jsonify({"error": "Dati modulo mancanti."}), 400
 
+        username = data.get('username', '').strip()
+        email = data.get('email', '').strip()
+        password = data.get('password', '')
+
+        if not username or not email or not password:
+            return jsonify({"error": "Tutti i campi (username, email, password) sono obbligatori."}), 400
+
+        # Cifra la password prima dell'inserimento nella colonna password_hash
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        
         connection = get_db_connection()
         with connection.cursor() as cursor:
             sql = "INSERT INTO Utente (username, email, password_hash, data_iscrizione) VALUES (%s, %s, %s, CURDATE())"
-            cursor.execute(sql, (data['username'], data['email'], password_hash))
+            cursor.execute(sql, (username, email, password_hash))
             connection.commit()
         connection.close()
-        return jsonify({"message": "Utente registrato con successo!"}), 201
+        
+        return jsonify({"message": "Utente registrato con successo nel database cloud!"}), 201
+        
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        # Gestione specifica degli utenti duplicati nel DB reale
+        error_msg = str(e)
+        if 'Duplicate entry' in error_msg:
+            if 'username' in error_msg:
+                return jsonify({"error": "Questo username è già stato preso. Scegline un altro."}), 409
+            if 'email' in error_msg:
+                return jsonify({"error": "Questa email è già associata a un account attivo."}), 409
+        return jsonify({"error": f"Errore durante la scrittura su TiDB: {error_msg}"}), 500
+    
 @app.route('/api/v3/utenti/<int:id_utente>', methods=['PUT'])
 def update_utente(id_utente):
     try:
@@ -508,9 +527,7 @@ def delete_utente(id_utente):
         return jsonify({"error": str(e)}), 500
 
 
-# =========================================================================
 # ⭐ SEZIONE 5: RECENSIONI (Feed & Critiche)
-# =========================================================================
 
 @app.route('/api/v1/recensioni', methods=['GET'])
 def get_all_recensioni():
@@ -552,7 +569,7 @@ def add_recensione():
             return jsonify({"error": "Hai già recensito questo contenuto."}), 409
         return jsonify({"error": str(e)}), 500
 
-# ⏬ NUOVA ROTTA: MODIFICA RECENSIONE (PUT) ⏬
+# NUOVA ROTTA: MODIFICA RECENSIONE (PUT) 
 @app.route('/api/v3/recensioni/<int:id_recensione>', methods=['PUT'])
 def update_recensione(id_recensione):
     try:
@@ -568,7 +585,7 @@ def update_recensione(id_recensione):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ⏬ NUOVA ROTTA: ELIMINAZIONE RECENSIONE (DELETE) ⏬
+# NUOVA ROTTA: ELIMINAZIONE RECENSIONE (DELETE)
 @app.route('/api/v3/recensioni/<int:id_recensione>', methods=['DELETE'])
 def delete_recensione(id_recensione):
     try:
@@ -582,10 +599,6 @@ def delete_recensione(id_recensione):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# =========================================================================
-# AVVIO APPLICAZIONE
-# =========================================================================
 if __name__ == '__main__':
     # host='0.0.0.0' mappa correttamente la porta per l'esterno all'interno di GitHub Codespaces
     app.run(debug=True, host='0.0.0.0', port=5000)

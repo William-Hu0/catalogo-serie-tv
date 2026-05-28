@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { ActivatedRoute } from '@angular/router';
+
 @Component({
   selector: 'app-media-list',
   standalone: true,
@@ -21,7 +22,9 @@ export class MediaListComponent implements OnInit {
   elencoMedia: any[] = [];
   elencoPiattaforme: any[] = [];
 
-  // ⏬ NUOVI STATI PER LA CREAZIONE DI UN MEDIA ⏬
+  // Può essere 'tabella' o 'cards'
+  modalitaVisualizzazione: 'tabella' | 'cards' = 'tabella';
+
   mostraFormAggiungi: boolean = false;
   staSalvando: boolean = false;
   messaggioSuccesso: string = '';
@@ -41,16 +44,20 @@ export class MediaListComponent implements OnInit {
   ngOnInit(): void {
     this.caricaPiattaforme();
     
-    // Legge i parametri passati dall'URL ed applica i filtri prima di caricare il catalogo
     this.route.queryParams.subscribe(params => {
       if (params['piattaforma']) {
         this.filtroPiattaforma = params['piattaforma'];
       }
       if (params['tipo']) {
-        this.filtroTipo = params['tipo']; // Imposterà automaticamente la tendina su 'SerieTV'
+        this.filtroTipo = params['tipo'];
       }
       this.caricaCatalogo(); 
     });
+  }
+
+  // Metodo per cambiare il layout delle card
+  cambiaVisualizzazione(modalita: 'tabella' | 'cards'): void {
+    this.modalitaVisualizzazione = modalita;
   }
 
   caricaPiattaforme(): void { 
@@ -99,7 +106,6 @@ export class MediaListComponent implements OnInit {
     this.messaggioSuccesso = '';
     this.messaggioErrore = '';
 
-    // Convertiamo i valori numerici prima dell'invio
     const payload = {
       ...this.nuovoMedia,
       anno_uscita: this.nuovoMedia.anno_uscita ? Number(this.nuovoMedia.anno_uscita) : null,
@@ -112,9 +118,8 @@ export class MediaListComponent implements OnInit {
         this.messaggioSuccesso = 'Contenuto aggiunto con successo nel database cloud!';
         this.staSalvando = false;
         this.mostraFormAggiungi = false;
-        this.caricaCatalogo(); // Ricarica la tabella aggiornata
+        this.caricaCatalogo();
         
-        // Reset del form
         this.nuovoMedia = {
           titolo: '',
           trama: '',

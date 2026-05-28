@@ -96,7 +96,7 @@ table.table td {
   background-color: rgba(255, 255, 255, 0.85) !important; /* Sfondo chiaro per far leggere il testo nero */
 }
 .bio-text {
-  color: #000000 !important;          /* FORZA IL COLORE NERO ASSOLUTO */
+  color: #ffffff !important;          /* FORZA IL COLORE NERO ASSOLUTO */
   white-space: normal !important;      /* Permette il ritorno a capo */
   word-break: break-word !important;   /* Evita che le parole escano dal box */
   line-height: 1.6;                    /* Spaziatura di lettura ideale */
